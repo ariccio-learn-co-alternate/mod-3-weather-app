@@ -21,8 +21,4 @@ class Station < ApplicationRecord
       Station.haversine_distance(latitude, longitude, station.latitude, station.longitude)
     end
   end
-
-  def get_data
-    noaa_id
-  end
 end
