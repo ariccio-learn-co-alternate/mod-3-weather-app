@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+    <head>
+        <style src="index.css"></style>
+        <meta name="viewport" content="initial-scale=1.0">
+        <script>
+            // Uggh, this has to be inline else the map isn't working.
+            var map;
+            function initMap() {
+                map = new google.maps.Map(document.getElementById('map'), {
+                    center: {lat: 41, lng: -73},
+                    zoom: 8
+                });
+                const mapElem = document.getElementById("map");
+                mapElem.style.height = "600px";
+                google.maps.event.addListener(map, 'click', function( event ){
+                    console.log( "Latitude: "+event.latLng.lat()+" "+", longitude: "+event.latLng.lng() ); 
+                });
+
+            }
+        </script>
+        <script src="index.js" defer async></script>
+        <script src="https://www.google.com/maps/api/js?key=AIzaSyBEIbuuEKbZE0CjN-fYPOnqL9TQHcvMD4w&callback=initMap" type="text/javascript" async defer></script>
+    </head>
+    <body>
+        Click a location:
+        <div id="map" width="100%" height="100px">
+
+        </div>
+        <!-- <iframe width="600" height="450" frameborder="0" style="border:0" src="" allowfullscreen></iframe> -->
+    </body>
+</html>
