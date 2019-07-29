@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  noaa_id: MyString
+  latitude: 1.5
+  longitude: 1.5
+
+two:
+  noaa_id: MyString
+  latitude: 1.5
+  longitude: 1.5
