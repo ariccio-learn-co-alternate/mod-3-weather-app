@@ -1,54 +1,53 @@
 "use strict";
+const BASE_SERVER_PATH = "http://localhost:3000";
 
+const BASE_YOUR_STATION_ID = "your-station";
 
 function createCity(station) {
     const cityP = document.createElement("p");
     cityP.innerText = `City: ${station.city}`;
-    cityP.id = "your-station-city";
+    cityP.id = `${BASE_YOUR_STATION_ID}-city`;
     return cityP;
 }
 
 function createState(station) {
     const stateP = document.createElement("p");
     stateP.innerText = `State: ${station.state}`;
-    stateP.id = "your-station-state";
+    stateP.id = `${BASE_YOUR_STATION_ID}-state`;
     return stateP;
 }
 
 function createStationID(station) {
     const stationIDP = document.createElement("p");
     stationIDP.innerText = `station ID: ${station.id}`;
-    stationIDP.id = "your-station-id";
+    stationIDP.id = `${BASE_YOUR_STATION_ID}-id`;
     return stationIDP;
 }
 
 function createStationLat(station) {
     const latP = document.createElement("p");
     latP.innerText = `Station latitude: ${station.latitude}`;
-    latP.id = "your-station-lat";
+    latP.id = `${BASE_YOUR_STATION_ID}-lat`;
     return latP;
 }
 
 function createStationLong(station) {
     const longP = document.createElement("p");
     longP.innerText = `Station longitude: ${station.longitude}`;
-    longP.id = "your-station-long";
+    longP.id = `${BASE_YOUR_STATION_ID}-long`;
     return longP;
 }
 
 function createStationNOAAID(station) {
     const noaaIDP = document.createElement("p");
     noaaIDP.innerText = `noaa_id: ${station.noaa_id}`;
-    noaaIDP.id = "your-station-noaa-id";
+    noaaIDP.id = `${BASE_YOUR_STATION_ID}-noaa-id`;
     return noaaIDP;
 }
 
-function appendStationInfo(station) {
-    const stationDataDiv = document.querySelector("#station-data");
-    stationDataDiv.innerHTML = "";
-
+function renderStationSubDiv(station) {
     const newDiv = document.createElement("div");
-    newDiv.id = "your-station-data";
+    newDiv.id = `${BASE_YOUR_STATION_ID}-data`;
     
 
     // Example data:
@@ -61,14 +60,27 @@ function appendStationInfo(station) {
         // state: "NY"
         // updated_at: "2019-07-29T18:14:59.267Z"
 
+    // Station location data:
     newDiv.appendChild(createCity(station));
     newDiv.appendChild(createState(station));
     newDiv.appendChild(createStationID(station));
     newDiv.appendChild(createStationLat(station));
     newDiv.appendChild(createStationLong(station));
     newDiv.appendChild(createStationNOAAID(station));
+    
+    return newDiv;
+}
 
-    stationDataDiv.appendChild(newDiv);
+function appendStationInfo(station) {
+    const stationDataDiv = document.querySelector("#station-data");
+    stationDataDiv.innerHTML = "";
+    stationDataDiv.appendChild(renderStationSubDiv(station));
+
+    // precipitation,
+    // snow,
+    // average temp
+    // max temp
+    // min temp
 }
 
 function mapClick(event) {
@@ -76,7 +88,7 @@ function mapClick(event) {
         latitude: event.latLng.lat(),
         longitude: event.latLng.lng()
     };
-    fetch(`http://localhost:3000/stations/${btoa(JSON.stringify(body))}`).then(res => res.json()).then(response => {
+    fetch(`${BASE_SERVER_PATH}/stations/${btoa(JSON.stringify(body))}`).then(res => res.json()).then(response => {
         console.log(response);
         appendStationInfo(response);
     })
