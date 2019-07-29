@@ -14,7 +14,7 @@ api_key = ENV["API_KEY"]
 
 Station.destroy_all
 
-resp = RestClient::Request.execute(url: "https://www.ncdc.noaa.gov/cdo-web/api/v2/stations/?locationid=FIPS:US&enddate=1950-01-01&startdate=2000-01-01&datasetid=GSOY&sortfield=name&limit=500", method: "GET", headers: { token: api_key })
+resp = RestClient::Request.execute(url: "https://www.ncdc.noaa.gov/cdo-web/api/v2/stations/?locationid=FIPS:US&enddate=1950-01-01&startdate=2000-01-01&datasetid=GHCNDMS&datatypeid=TPCP&datatypeid=TSNW&datatypeid=MNTM&limit=500", method: "GET", headers: { token: api_key })
 
 JSON.parse(resp)["results"].each do |station|
   unparsed_name = station["name"]
