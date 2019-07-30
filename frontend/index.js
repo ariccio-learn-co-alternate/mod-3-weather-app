@@ -270,6 +270,10 @@ function renderYear(response) {
     if (chart == null) {
         chart = new Chart(graphCanvas2dCtx(), chartConfig(response));
     }
+    else {
+        chart.destroy();
+        chart = new Chart(graphCanvas2dCtx(), chartConfig(response));
+    }
 }
 
 function yearFormHandler(event) {
