@@ -112,7 +112,7 @@ function fetchYearURL(target, userYear) {
     // noaa_id : ...
     // year : ...
     const body = {
-        noaa_id: target.dataset.year,
+        noaa_id: target.dataset.noaa_id,
         year: userYear
     };
     return `${BASE_SERVER_PATH}/weather/${btoa(JSON.stringify(body))}`;
