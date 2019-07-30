@@ -5,9 +5,28 @@
     width: 100%;
 }
 
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
+/* Optional: Makes the sample page fill the window. */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+
+.lower-half-wrapper {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 10px;
+  grid-auto-rows: minmax(100px, auto);
+}
+
+#station-data {
+  grid-column: 1;
+  grid-row: 1;
+
+}
+
+#year-input-box-form {
+  grid-column: 2;
+  grid-row: 1;
+}
