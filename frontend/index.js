@@ -51,17 +51,17 @@ function createStationNOAAID(station) {
 function renderStationSubDiv(station) {
     const newDiv = document.createElement("div");
     newDiv.id = `${BASE_YOUR_STATION_ID}-data`;
-    
+
 
     // Example data:
-        // city: "Westchester Co Airport"
-        // created_at: "2019-07-29T18:14:59.267Z"
-        // id: 108
-        // latitude: 41.06694
-        // longitude: -73.7075
-        // noaa_id: "GHCND:USW00094745"
-        // state: "NY"
-        // updated_at: "2019-07-29T18:14:59.267Z"
+    // city: "Westchester Co Airport"
+    // created_at: "2019-07-29T18:14:59.267Z"
+    // id: 108
+    // latitude: 41.06694
+    // longitude: -73.7075
+    // noaa_id: "GHCND:USW00094745"
+    // state: "NY"
+    // updated_at: "2019-07-29T18:14:59.267Z"
 
     // Station location data:
     newDiv.appendChild(createCity(station));
@@ -70,7 +70,7 @@ function renderStationSubDiv(station) {
     newDiv.appendChild(createStationLat(station));
     newDiv.appendChild(createStationLong(station));
     newDiv.appendChild(createStationNOAAID(station));
-    
+
     return newDiv;
 }
 
@@ -99,15 +99,15 @@ function fetchStationURL(event) {
         latitude: event.latLng.lat(),
         longitude: event.latLng.lng()
     };
-    return `${BASE_SERVER_PATH}/stations/${btoa(JSON.stringify(body))}` 
+    return `${BASE_SERVER_PATH}/stations/${btoa(JSON.stringify(body))}`
 }
 
 function mapClick(event) {
     fetch(fetchStationURL(event))
         .then(res => res.json()).then(response => {
-        console.log(response);
-        appendStationInfo(response);
-    })
+            console.log(response);
+            appendStationInfo(response);
+        })
 }
 
 function fetchYearURL(target, userYear) {
@@ -151,15 +151,19 @@ function topRow() {
     const monthTH = document.createElement("th");
     monthTH.innerText = "Month";
     headerTR.appendChild(monthTH);
-    
+
+    const tempTH = document.createElement("th");
+    tempTH.innerText = "Average temperature (\xB0F)";
+    headerTR.appendChild(tempTH);
+
     const precipTH = document.createElement("th");
-    precipTH.innerText = "Total precipitation";
+    precipTH.innerText = "Total precipitation (in.)";
     headerTR.appendChild(precipTH);
 
     const snowTH = document.createElement("th");
-    snowTH.innerText = "Total snow";
+    snowTH.innerText = "Total snow (in.)";
     headerTR.appendChild(snowTH);
-    
+
     return headerTR;
 }
 
@@ -167,6 +171,10 @@ function createRow(tr, rowData) {
     const monthTd = document.createElement("td");
     monthTd.innerText = rowData["month"];
     tr.appendChild(monthTd);
+
+    const tempTd = document.createElement("td");
+    tempTd.innerText = rowData["mean_temp"];
+    tr.appendChild(tempTd);
 
     const precipTd = document.createElement("td");
     precipTd.innerText = rowData["total_precip"];
@@ -186,7 +194,7 @@ function slapYearDataOnDOM(response) {
     tHead.appendChild(topRow());
 
     const tBody = document.createElement("tbody");
-    for(let i = 0; i < response.results.length; i++) {
+    for (let i = 0; i < response.results.length; i++) {
         const newTR = document.createElement("tr");
         createRow(newTR, response.results[i]);
         tBody.appendChild(newTR);

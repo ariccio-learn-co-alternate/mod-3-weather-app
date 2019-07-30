@@ -1,7 +1,6 @@
 class Station < ApplicationRecord
   Dotenv.load("api_key.env")
   @@api_key = ENV["API_KEY"]
-  #
   def self.haversine_distance(lat1, lon1, lat2, lon2)
     # Get latitude and longitude
 
