@@ -12,7 +12,7 @@
                     zoom: 8
                 });
                 const mapElem = document.getElementById("map");
-                mapElem.style.height = "600px";
+                mapElem.style.height = "500px";
                 google.maps.event.addListener(map, 'click', function( event ){
                     console.log( "Latitude: "+event.latLng.lat()+" "+", longitude: "+event.latLng.lng() ); 
                     mapClick(event);
@@ -22,7 +22,7 @@
         </script>
         <script src="index.js" defer async></script>
         <!-- Key has to be publicly visible, it's a browser key -->
-        <!-- TODO: if we actually deploy it, restrict to referrers in console. -->
+        <!-- TODO: if we actually deploy it, restrict to referrers in google api console. -->
         <script src="https://www.google.com/maps/api/js?key=AIzaSyC9yXOwvjtzat-Us9Jwx9K-x7bFFPK_1Dw&callback=initMap" type="text/javascript" async defer></script>
     </head>
     <body>
@@ -31,10 +31,17 @@
 
         </div>
 
-        <div id="station-data">
+        <div class="lower-half-wrapper">
+            <div id="station-data">
 
+            </div>
+
+            <form class="input-box" action="#" method="post" hidden id="year-input-box-form">
+                <h3>Select a year</h3>
+                <input type="number" name="year" min="1950" max="2000">
+                <input type="submit" name="" value="lookup year">
+            </form>
         </div>
-        
         <!-- <iframe width="600" height="450" frameborder="0" style="border:0" src="" allowfullscreen></iframe> -->
     </body>
 </html>
