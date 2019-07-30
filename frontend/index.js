@@ -2,6 +2,8 @@
 const BASE_SERVER_PATH = "http://localhost:3000";
 
 const BASE_YOUR_STATION_ID = "your-station";
+const INPUT_BOX_CLASS = "input-box";
+const YEAR_INPUT_BOX_FORM_ID = "year-input-box-form"
 
 function createCity(station) {
     const cityP = document.createElement("p");
@@ -71,6 +73,14 @@ function renderStationSubDiv(station) {
     return newDiv;
 }
 
+function renderYearInputBox(station) {
+    const oldForm = document.querySelector(`#${YEAR_INPUT_BOX_FORM_ID}`);
+    oldForm.hidden = false;
+    oldForm.dataset.noaa_id = station.noaa_id;
+
+
+}
+
 function appendStationInfo(station) {
     const stationDataDiv = document.querySelector("#station-data");
     stationDataDiv.innerHTML = "";
@@ -81,6 +91,8 @@ function appendStationInfo(station) {
     // average temp
     // max temp
     // min temp
+
+    renderYearInputBox(station);
 }
 
 function mapClick(event) {
