@@ -20,14 +20,14 @@ function axesWithLabel(label) {
     return axe;
 }
 
-function chartConfig(response) {
+function chartConfig(response, graphDatatypeInput) {
     // based on sample code: https://github.com/chartjs/Chart.js/blob/master/samples/charts/line/basic.html
     const config = {
         type: 'line',
         data: {
             labels: MONTHS,
             datasets: [
-                datasetFromResponse(response, 'temperatures', 'mean_temp')
+                datasetFromResponse(response, graphDatatypeInput, graphDatatypeInput)
             ]
         },
         options: {
@@ -46,23 +46,24 @@ function chartConfig(response) {
             },
             scales: {
                 xAxes: [axesWithLabel('month')],
-                yAxes: [axesWithLabel('temperature')]
+                yAxes: [axesWithLabel(graphDatatypeInput)]
             }
         }
     };
     return config;
 }
 
-function renderYear(response) {
+function renderYear(response, graphDatatypeInput) {
     console.log(response);
     slapYearDataOnDOM(response);
     if (chart == null) {
-        chart = new Chart(graphCanvas2dCtx(), chartConfig(response));
+        chart = new Chart(graphCanvas2dCtx(), chartConfig(response, graphDatatypeInput));
     }
     else {
         chart.destroy();
-        chart = new Chart(graphCanvas2dCtx(), chartConfig(response));
+        chart = new Chart(graphCanvas2dCtx(), chartConfig(response, graphDatatypeInput));
     }
+    // document.getElementById("graph-temperature-button").addEventListener('click', )
 }
 
 

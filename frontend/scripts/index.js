@@ -280,7 +280,7 @@ function yearFormHandler(event) {
     const userYear = parseInt(event.target.year.value);
     console.log(`user wants data for year ${userYear}`);
     fetch(fetchYearURL(event.target, userYear)).then(res => res.json()).then(response => {
-        renderYear(response);
+        renderYear(response, event.target.graph_datatype_input.value);
     })
 }
 // I know it's not C++, don't @ me bro.

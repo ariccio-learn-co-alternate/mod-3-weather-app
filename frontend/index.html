@@ -72,13 +72,18 @@
           max="2000"
           id="year-field-id"
         />
-        <input type="submit" name="" value="lookup year" />
+        <input type="radio" name="graph_datatype_input" value="mean_temp" id="graph-temperature-input">Temperature<br>
+        <input type="radio" name="graph_datatype_input" value="total_precip" id="graph-precipitation-input">Precipitation<br>
+        <input type="radio" name="graph_datatype_input" value="total_snow" id="graph-snow-input">Snow</br>
+      <input type="submit" name="" value="lookup year" />
       </form>
     </div>
 
 
         <div id="monthly-data-table-wrapper"></div>
-        <div><canvas id="graph-canvas"></canvas></div>
+        <div>
+          <canvas id="graph-canvas"></canvas>
+        </div>
 
     </div>
     <!-- <iframe width="600" height="450" frameborder="0" style="border:0" src="" allowfullscreen></iframe> -->
