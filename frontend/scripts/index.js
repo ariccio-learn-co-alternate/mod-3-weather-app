@@ -5,8 +5,8 @@ const INPUT_BOX_CLASS = "input-box";
 const YEAR_INPUT_BOX_FORM_ID = "year-input-box-form";
 const MONTHLY_DATA_TABLE_ID = "monthly-data-table";
 const MONTHLY_DATA_TABLE_WRAPPER = "monthly-data-table-wrapper";
-const MONTHS = [ "January", "February", "March", "April", "May", "June", "July", "August",
-                 "September", "October", "November", "December"];
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August",
+    "September", "October", "November", "December"];
 
 let chart = null;
 
@@ -153,23 +153,33 @@ function newTableHeader(headerText) {
 
 
 function topRow() {
+    // const headerTR = document.createElement("tr");
+    // const monthTH = document.createElement("th");
+    // monthTH.innerText = "Month";
+    // headerTR.appendChild(monthTH);
+
+    // const tempTH = document.createElement("th");
+    // tempTH.innerText = "Average temperature (\xB0F)";
+    // headerTR.appendChild(tempTH);
+
+    // const precipTH = document.createElement("th");
+    // precipTH.innerText = "Total precipitation (in.)";
+    // headerTR.appendChild(precipTH);
+
+    // const snowTH = document.createElement("th");
+    // snowTH.innerText = "Total snow (in.)";
+    // headerTR.appendChild(snowTH);
     const headerTR = document.createElement("tr");
-    const monthTH = document.createElement("th");
-    monthTH.innerText = "Month";
-    headerTR.appendChild(monthTH);
-
-    const tempTH = document.createElement("th");
-    tempTH.innerText = "Average temperature (\xB0F)";
-    headerTR.appendChild(tempTH);
-
-    const precipTH = document.createElement("th");
-    precipTH.innerText = "Total precipitation (in.)";
-    headerTR.appendChild(precipTH);
-
-    const snowTH = document.createElement("th");
-    snowTH.innerText = "Total snow (in.)";
-    headerTR.appendChild(snowTH);
-
+    const corner = document.createElement('th');
+    corner.innerText = '#'
+    headerTR.appendChild(corner)
+    MONTHS.forEach(
+        function (month) {
+            const header = document.createElement("th");
+            header.innerText = month;
+            headerTR.appendChild(header)
+        }
+    )
     return headerTR;
 }
 
@@ -209,72 +219,6 @@ function slapYearDataOnDOM(response) {
     table.appendChild(tBody);
 }
 
-function datasetFromResponse(response, label, key) {
-    const dataset = {
-        label: label,
-        backgroundColor: 'black',
-        borderColor: 'black',
-        data: response.results.map(result => result[key]),
-        fill: false
-    }
-    return dataset;
-}
-
-function axesWithLabel(label) {
-    const axe = {
-        display: true,
-        scaleLabel: {
-            display: true,
-            labelString: label
-        }
-    }
-    return axe;
-}
-
-function chartConfig(response) {
-    // based on sample code: https://github.com/chartjs/Chart.js/blob/master/samples/charts/line/basic.html
-    const config = {
-        type: 'line',
-        data: {
-            labels: MONTHS,
-            datasets: [
-                datasetFromResponse(response, 'temperatures', 'mean_temp')
-            ]
-        },
-        options: {
-            responsive: true,
-            title: {
-                display: true,
-                text: `Data for ${response.meta.noaa_id}`
-            },
-            tooltips: {
-                mode: 'index',
-                intersect: false
-            },
-            hover: {
-                mode: 'nearest',
-                intersect: false
-            },
-            scales: {
-                xAxes: [axesWithLabel('month')],
-                yAxes: [axesWithLabel('temperature')]
-            }
-        }
-    };
-    return config;
-}
-
-function renderYear(response) {
-    console.log(response);
-    slapYearDataOnDOM(response);
-    if (chart == null) {
-        chart = new Chart(graphCanvas2dCtx(), chartConfig(response));
-    }
-    else {
-        chart.destroy();
-        chart = new Chart(graphCanvas2dCtx(), chartConfig(response));
-    }
-}
 
 function yearFormHandler(event) {
     event.preventDefault();
@@ -284,13 +228,6 @@ function yearFormHandler(event) {
         renderYear(response);
     })
 }
-
-function graphCanvas2dCtx() {
-    const graphCanvas = document.getElementById("graph-canvas");
-    const graphCanvasCtx = graphCanvas.getContext('2d');
-    return graphCanvasCtx;
-}
-
 // I know it's not C++, don't @ me bro.
 function main() {
     const yearForm = document.querySelector(`#${YEAR_INPUT_BOX_FORM_ID}`);
