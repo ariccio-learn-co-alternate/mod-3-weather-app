@@ -2,7 +2,9 @@
 const BASE_SERVER_PATH = "http://localhost:3000";
 const BASE_YOUR_STATION_ID = "your-station";
 const INPUT_BOX_CLASS = "input-box";
-const YEAR_INPUT_BOX_FORM_ID = "year-input-box-form"
+const YEAR_INPUT_BOX_FORM_ID = "year-input-box-form";
+const MONTHLY_DATA_TABLE_ID = "monthly-data-table";
+const MONTHLY_DATA_TABLE_WRAPPER = "monthly-data-table-wrapper";
 
 function createCity(station) {
     const cityP = document.createElement("p");
@@ -118,12 +120,87 @@ function fetchYearURL(target, userYear) {
     return `${BASE_SERVER_PATH}/weather/${btoa(JSON.stringify(body))}`;
 }
 
+function findOldTableAndEmptyOrCreateEmptyTable(id, div) {
+    const table = document.querySelector(`#${id}`);
+    if (!table) {
+        const newTable = document.createElement("table");
+        newTable.id = id;
+        const divToAddTo = document.querySelector(`#${div}`);
+        divToAddTo.appendChild(newTable);
+        return newTable;
+    }
+    table.innerHTML = "";
+    return table;
+}
+
+function newTableHeader(headerText) {
+    const newThead = document.createElement("thead");
+    const newTR = document.createElement("tr");
+    const newTH = document.createElement("th");
+    newTH.innerText = headerText;
+    newTH.colSpan = 3;
+
+    newTR.appendChild(newTH);
+    newThead.appendChild(newTR);
+    return newThead;
+}
+
+
+function topRow() {
+    const headerTR = document.createElement("tr");
+    const monthTH = document.createElement("th");
+    monthTH.innerText = "Month";
+    headerTR.appendChild(monthTH);
+    
+    const precipTH = document.createElement("th");
+    precipTH.innerText = "Total precipitation";
+    headerTR.appendChild(precipTH);
+
+    const snowTH = document.createElement("th");
+    snowTH.innerText = "Total snow";
+    headerTR.appendChild(snowTH);
+    
+    return headerTR;
+}
+
+function createRow(tr, rowData) {
+    const monthTd = document.createElement("td");
+    monthTd.innerText = rowData["month"];
+    tr.appendChild(monthTd);
+
+    const precipTd = document.createElement("td");
+    precipTd.innerText = rowData["total_precip"];
+    tr.appendChild(precipTd);
+
+    const snowTd = document.createElement("td");
+    snowTd.innerText = rowData["total_snow"];
+    tr.appendChild(snowTd);
+}
+
+
+function slapYearDataOnDOM(response) {
+    const table = findOldTableAndEmptyOrCreateEmptyTable(MONTHLY_DATA_TABLE_ID, MONTHLY_DATA_TABLE_WRAPPER);
+    const tHead = newTableHeader(`Monthly data for year ${response.meta.year}, stationID: ${response.meta.noaa_id}`)
+    table.appendChild(tHead);
+
+    tHead.appendChild(topRow());
+
+    const tBody = document.createElement("tbody");
+    for(let i = 0; i < response.results.length; i++) {
+        const newTR = document.createElement("tr");
+        createRow(newTR, response.results[i]);
+        tBody.appendChild(newTR);
+    }
+    table.appendChild(tBody);
+}
+
 function yearFormHandler(event) {
     event.preventDefault();
     const userYear = parseInt(event.target.year.value);
     console.log(`user wants data for year ${userYear}`);
     fetch(fetchYearURL(event.target, userYear)).then(res => res.json()).then(response => {
         console.log(response);
+        slapYearDataOnDOM(response);
     })
 }
 
