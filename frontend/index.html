@@ -30,6 +30,7 @@
       }
     </script>
     <script src="index.js" defer async></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js" defer></script>
     <!-- Key has to be publicly visible, it's a browser key -->
     <!-- TODO: if we actually deploy it, restrict to referrers in google api console. -->
     <script
@@ -73,7 +74,7 @@
     <div class="container">
       <div class="row">
         <div class="col-sm" id="monthly-data-table-wrapper"></div>
-        <div class="col-sm"></div>
+        <div class="col-sm"><canvas id="graph-canvas"></canvas></div>
       </div>
     </div>
     <!-- <iframe width="600" height="450" frameborder="0" style="border:0" src="" allowfullscreen></iframe> -->

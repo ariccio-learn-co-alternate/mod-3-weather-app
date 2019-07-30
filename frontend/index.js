@@ -5,6 +5,10 @@ const INPUT_BOX_CLASS = "input-box";
 const YEAR_INPUT_BOX_FORM_ID = "year-input-box-form";
 const MONTHLY_DATA_TABLE_ID = "monthly-data-table";
 const MONTHLY_DATA_TABLE_WRAPPER = "monthly-data-table-wrapper";
+const MONTHS = [ "January", "February", "March", "April", "May", "June", "July", "August",
+                 "September", "October", "November", "December"];
+
+let chart = null;
 
 function createCity(station) {
     const cityP = document.createElement("p");
@@ -99,7 +103,7 @@ function fetchStationURL(event) {
         latitude: event.latLng.lat(),
         longitude: event.latLng.lng()
     };
-    return `${BASE_SERVER_PATH}/stations/${btoa(JSON.stringify(body))}`
+    return `${BASE_SERVER_PATH}/stations/${btoa(JSON.stringify(body))}`;
 }
 
 function mapClick(event) {
@@ -124,7 +128,7 @@ function findOldTableAndEmptyOrCreateEmptyTable(id, div) {
     const table = document.querySelector(`#${id}`);
     if (!table) {
         const newTable = document.createElement("table");
-        newTable.className = 'table table-dark table-hover smushed-table'
+        newTable.className = 'table table-dark table-hover smushed-table';
         newTable.id = id;
         const divToAddTo = document.querySelector(`#${div}`);
         divToAddTo.appendChild(newTable);
@@ -140,7 +144,7 @@ function newTableHeader(headerText) {
     const newTH = document.createElement("th");
     newTH.innerText = headerText;
     newTH.colSpan = 3;
-    newTH.className = 'thead'
+    newTH.className = 'thead';
 
     newTR.appendChild(newTH);
     newThead.appendChild(newTR);
@@ -190,7 +194,7 @@ function createRow(tr, rowData) {
 
 function slapYearDataOnDOM(response) {
     const table = findOldTableAndEmptyOrCreateEmptyTable(MONTHLY_DATA_TABLE_ID, MONTHLY_DATA_TABLE_WRAPPER);
-    const tHead = newTableHeader(`Monthly data for year ${response.meta.year}`)
+    const tHead = newTableHeader(`Monthly data for year ${response.meta.year}`);
     table.appendChild(tHead);
 
     tHead.appendChild(topRow());
@@ -205,20 +209,83 @@ function slapYearDataOnDOM(response) {
     table.appendChild(tBody);
 }
 
+function chartConfig(response) {
+    // based on sample code: https://github.com/chartjs/Chart.js/blob/master/samples/charts/line/basic.html
+    const config = {
+        type: 'line',
+        data: {
+            labels: MONTHS,
+            datasets: [{
+                label: 'temperatures',
+                backgroundColor: 'black',
+                borderColor: 'black',
+                data: response.results.map(result => result["mean_temp"]),
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            title: {
+                display: true,
+                text: `Data for ${response.meta.noaa_id}`
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: false
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: false
+            },
+            scales: {
+                xAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'month'
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'temperature'
+                    }
+                }]
+            }
+        }
+    };
+    return config;
+}
+
+function renderYear(response) {
+    console.log(response);
+    slapYearDataOnDOM(response);
+    if (chart == null) {
+        chart = new Chart(graphCanvas2dCtx(), chartConfig(response));
+    }
+}
+
 function yearFormHandler(event) {
     event.preventDefault();
     const userYear = parseInt(event.target.year.value);
     console.log(`user wants data for year ${userYear}`);
     fetch(fetchYearURL(event.target, userYear)).then(res => res.json()).then(response => {
-        console.log(response);
-        slapYearDataOnDOM(response);
+        renderYear(response);
     })
+}
+
+function graphCanvas2dCtx() {
+    const graphCanvas = document.getElementById("graph-canvas");
+    const graphCanvasCtx = graphCanvas.getContext('2d');
+    return graphCanvasCtx;
 }
 
 // I know it's not C++, don't @ me bro.
 function main() {
     const yearForm = document.querySelector(`#${YEAR_INPUT_BOX_FORM_ID}`);
     yearForm.addEventListener('submit', yearFormHandler);
+    // chart = chart(ctx, config);
 }
 
 main();
