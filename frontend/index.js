@@ -124,6 +124,7 @@ function findOldTableAndEmptyOrCreateEmptyTable(id, div) {
     const table = document.querySelector(`#${id}`);
     if (!table) {
         const newTable = document.createElement("table");
+        newTable.className = 'table table-dark table-hover smushed-table'
         newTable.id = id;
         const divToAddTo = document.querySelector(`#${div}`);
         divToAddTo.appendChild(newTable);
@@ -139,6 +140,7 @@ function newTableHeader(headerText) {
     const newTH = document.createElement("th");
     newTH.innerText = headerText;
     newTH.colSpan = 3;
+    newTH.className = 'thead'
 
     newTR.appendChild(newTH);
     newThead.appendChild(newTR);
@@ -188,7 +190,7 @@ function createRow(tr, rowData) {
 
 function slapYearDataOnDOM(response) {
     const table = findOldTableAndEmptyOrCreateEmptyTable(MONTHLY_DATA_TABLE_ID, MONTHLY_DATA_TABLE_WRAPPER);
-    const tHead = newTableHeader(`Monthly data for year ${response.meta.year}, stationID: ${response.meta.noaa_id}`)
+    const tHead = newTableHeader(`Monthly data for year ${response.meta.year}`)
     table.appendChild(tHead);
 
     tHead.appendChild(topRow());
@@ -197,6 +199,7 @@ function slapYearDataOnDOM(response) {
     for (let i = 0; i < response.results.length; i++) {
         const newTR = document.createElement("tr");
         createRow(newTR, response.results[i]);
+        newTR.className = "smushed-row"
         tBody.appendChild(newTR);
     }
     table.appendChild(tBody);

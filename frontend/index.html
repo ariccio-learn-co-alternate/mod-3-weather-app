@@ -8,11 +8,12 @@
       function initMap() {
         map = new google.maps.Map(document.getElementById("map"), {
           center: { lat: 39.8097343, lng: -98.5556199 },
-          zoom: 4,
+          zoom: 3.8,
           gestureHandling: "none",
           zoomControl: false,
           streetViewControl: false,
-          fullscreenControl: false
+          fullscreenControl: false,
+          mapTypeControl: false
         });
         const mapElem = document.getElementById("map");
         mapElem.style.height = "500px";
@@ -37,7 +38,9 @@
       async
       defer
     ></script>
-    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="styles/bootstrap.min.css" />
+    <link rel="stylesheet" href="styles/bootstrap-grid.min.css" />
+    <link rel="stylesheet" href="styles/index.css" />
   </head>
   <body>
     <h2>Click a location:</h2>
@@ -67,7 +70,12 @@
       </form>
     </div>
 
-    <div class="wrapper" id="monthly-data-table-wrapper"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm" id="monthly-data-table-wrapper"></div>
+        <div class="col-sm"></div>
+      </div>
+    </div>
     <!-- <iframe width="600" height="450" frameborder="0" style="border:0" src="" allowfullscreen></iframe> -->
   </body>
 </html>
