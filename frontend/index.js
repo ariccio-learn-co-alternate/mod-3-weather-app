@@ -1,6 +1,5 @@
 "use strict";
 const BASE_SERVER_PATH = "http://localhost:3000";
-
 const BASE_YOUR_STATION_ID = "your-station";
 const INPUT_BOX_CLASS = "input-box";
 const YEAR_INPUT_BOX_FORM_ID = "year-input-box-form"
@@ -77,8 +76,6 @@ function renderYearInputBox(station) {
     const oldForm = document.querySelector(`#${YEAR_INPUT_BOX_FORM_ID}`);
     oldForm.hidden = false;
     oldForm.dataset.noaa_id = station.noaa_id;
-
-
 }
 
 function appendStationInfo(station) {
@@ -95,15 +92,45 @@ function appendStationInfo(station) {
     renderYearInputBox(station);
 }
 
-function mapClick(event) {
+function fetchStationURL(event) {
     const body = {
         latitude: event.latLng.lat(),
         longitude: event.latLng.lng()
     };
-    fetch(`${BASE_SERVER_PATH}/stations/${btoa(JSON.stringify(body))}`).then(res => res.json()).then(response => {
+    return `${BASE_SERVER_PATH}/stations/${btoa(JSON.stringify(body))}` 
+}
+
+function mapClick(event) {
+    fetch(fetchStationURL(event))
+        .then(res => res.json()).then(response => {
         console.log(response);
         appendStationInfo(response);
     })
-    
 }
 
+function fetchYearURL(target, userYear) {
+    // noaa_id : ...
+    // year : ...
+    const body = {
+        noaa_id: target.dataset.year,
+        year: userYear
+    };
+    return `${BASE_SERVER_PATH}/weather/${btoa(JSON.stringify(body))}`;
+}
+
+function yearFormHandler(event) {
+    event.preventDefault();
+    const userYear = parseInt(event.target.year.value);
+    console.log(`user wants data for year ${userYear}`);
+    fetch(fetchYearURL(event.target, userYear)).then(res => res.json()).then(response => {
+        console.log(response);
+    })
+}
+
+// I know it's not C++, don't @ me bro.
+function main() {
+    const yearForm = document.querySelector(`#${YEAR_INPUT_BOX_FORM_ID}`);
+    yearForm.addEventListener('submit', yearFormHandler);
+}
+
+main();
