@@ -209,19 +209,37 @@ function slapYearDataOnDOM(response) {
     table.appendChild(tBody);
 }
 
+function datasetFromResponse(response, label, key) {
+    const dataset = {
+        label: label,
+        backgroundColor: 'black',
+        borderColor: 'black',
+        data: response.results.map(result => result[key]),
+        fill: false
+    }
+    return dataset;
+}
+
+function axesWithLabel(label) {
+    const axe = {
+        display: true,
+        scaleLabel: {
+            display: true,
+            labelString: label
+        }
+    }
+    return axe;
+}
+
 function chartConfig(response) {
     // based on sample code: https://github.com/chartjs/Chart.js/blob/master/samples/charts/line/basic.html
     const config = {
         type: 'line',
         data: {
             labels: MONTHS,
-            datasets: [{
-                label: 'temperatures',
-                backgroundColor: 'black',
-                borderColor: 'black',
-                data: response.results.map(result => result["mean_temp"]),
-                fill: false
-            }]
+            datasets: [
+                datasetFromResponse(response, 'temperatures', 'mean_temp')
+            ]
         },
         options: {
             responsive: true,
@@ -238,20 +256,8 @@ function chartConfig(response) {
                 intersect: false
             },
             scales: {
-                xAxes: [{
-                    display: true,
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'month'
-                    }
-                }],
-                yAxes: [{
-                    display: true,
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'temperature'
-                    }
-                }]
+                xAxes: [axesWithLabel('month')],
+                yAxes: [axesWithLabel('temperature')]
             }
         }
     };
