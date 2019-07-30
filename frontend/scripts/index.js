@@ -110,8 +110,20 @@ function mapClick(event) {
     fetch(fetchStationURL(event))
         .then(res => res.json()).then(response => {
             console.log(response);
+            const chartHolder = document.querySelector('#monthly-data-table-wrapper')
+            chartHolder.innerHTML = ""
+
+            if (chart) {
+                chart.destroy()
+                chart = null
+                document.querySelector('#graph-holder').innerHTML = ""
+            }
+
             appendStationInfo(response);
-        })
+
+        }
+        )
+
 }
 
 function fetchYearURL(target, userYear) {

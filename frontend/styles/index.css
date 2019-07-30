@@ -32,11 +32,11 @@ html, body {
 
 }
 
+#monthly-data-table-wrapper {
+  margin: 10px 20px;
+}
+
 #year-input-box-form {
   grid-column: 2;
   grid-row: 1;
-}
-
-.smushed-row {
-  line-height: 0.5em;
 }
