@@ -5,8 +5,8 @@ const INPUT_BOX_CLASS = "input-box";
 const YEAR_INPUT_BOX_FORM_ID = "year-input-box-form";
 const MONTHLY_DATA_TABLE_ID = "monthly-data-table";
 const MONTHLY_DATA_TABLE_WRAPPER = "monthly-data-table-wrapper";
-const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August",
-    "September", "October", "November", "December"];
+const MONTHS = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.",
+    "Sep.", "Oct.", "Nov.", "Dec."];
 
 let chart = null;
 
@@ -138,21 +138,21 @@ function findOldTableAndEmptyOrCreateEmptyTable(id, div) {
     return table;
 }
 
-function newTableHeader(headerText) {
-    const newThead = document.createElement("thead");
-    const newTR = document.createElement("tr");
-    const newTH = document.createElement("th");
-    newTH.innerText = headerText;
-    newTH.colSpan = 3;
-    newTH.className = 'thead';
+// function newTableHeader(headerText) {
+//     const newThead = document.createElement("thead");
+//     const newTR = document.createElement("tr");
+//     const newTH = document.createElement("th");
+//     newTH.innerText = headerText;
+//     newTH.colSpan = 3;
+//     newTH.className = 'thead';
 
-    newTR.appendChild(newTH);
-    newThead.appendChild(newTR);
-    return newThead;
-}
+//     newTR.appendChild(newTH);
+//     newThead.appendChild(newTR);
+//     return newThead;
+// }
 
 
-function topRow() {
+function topRow(year) {
     // const headerTR = document.createElement("tr");
     // const monthTH = document.createElement("th");
     // monthTH.innerText = "Month";
@@ -171,7 +171,7 @@ function topRow() {
     // headerTR.appendChild(snowTH);
     const headerTR = document.createElement("tr");
     const corner = document.createElement('th');
-    corner.innerText = '#'
+    corner.innerText = `Monthly Data for ${year}`
     headerTR.appendChild(corner)
     MONTHS.forEach(
         function (month) {
@@ -183,39 +183,94 @@ function topRow() {
     return headerTR;
 }
 
-function createRow(tr, rowData) {
-    const monthTd = document.createElement("td");
-    monthTd.innerText = rowData["month"];
-    tr.appendChild(monthTd);
-
-    const tempTd = document.createElement("td");
-    tempTd.innerText = rowData["mean_temp"];
-    tr.appendChild(tempTd);
-
-    const precipTd = document.createElement("td");
-    precipTd.innerText = rowData["total_precip"];
-    tr.appendChild(precipTd);
-
-    const snowTd = document.createElement("td");
-    snowTd.innerText = rowData["total_snow"];
-    tr.appendChild(snowTd);
+function createTempRow(newTR, results) {
+    const firstCell = document.createElement('td')
+    firstCell.innerText = "Average temperature (\xB0F)"
+    newTR.appendChild(firstCell)
+    results.forEach(
+        function (result) {
+            const cell = document.createElement('td')
+            cell.innerText = result.mean_temp
+            newTR.appendChild(cell)
+        }
+    )
 }
+
+function createPrecipRow(newTR, results) {
+    const firstCell = document.createElement('td')
+    firstCell.innerText = "Total precipitation (in.)"
+    newTR.appendChild(firstCell)
+    results.forEach(
+        function (result) {
+            const cell = document.createElement('td')
+            cell.innerText = result.total_precip
+            newTR.appendChild(cell)
+        }
+    )
+}
+
+function createSnowRow(newTR, results) {
+    const firstCell = document.createElement('td')
+    firstCell.innerText = "Total snowfall (in.)"
+    newTR.appendChild(firstCell)
+    results.forEach(
+        function (result) {
+            const cell = document.createElement('td')
+            cell.innerText = result.total_snow
+            newTR.appendChild(cell)
+        }
+    )
+}
+
+
+
+
+// function createRow(tr, rowData) {
+//     const monthTd = document.createElement("td");
+//     monthTd.innerText = rowData["month"];
+//     tr.appendChild(monthTd);
+
+//     const tempTd = document.createElement("td");
+//     tempTd.innerText = rowData["mean_temp"];
+//     tr.appendChild(tempTd);
+
+//     const precipTd = document.createElement("td");
+//     precipTd.innerText = rowData["total_precip"];
+//     tr.appendChild(precipTd);
+
+//     const snowTd = document.createElement("td");
+//     snowTd.innerText = rowData["total_snow"];
+//     tr.appendChild(snowTd);
+// }
 
 
 function slapYearDataOnDOM(response) {
     const table = findOldTableAndEmptyOrCreateEmptyTable(MONTHLY_DATA_TABLE_ID, MONTHLY_DATA_TABLE_WRAPPER);
-    const tHead = newTableHeader(`Monthly data for year ${response.meta.year}`);
-    table.appendChild(tHead);
+    // const tHead = document.createElement('th')
+    // tHead.colSpan = 13
+    // table.appendChild(tHead);
 
-    tHead.appendChild(topRow());
+    table.appendChild(topRow(response.meta.year));
 
     const tBody = document.createElement("tbody");
-    for (let i = 0; i < response.results.length; i++) {
-        const newTR = document.createElement("tr");
-        createRow(newTR, response.results[i]);
-        newTR.className = "smushed-row"
-        tBody.appendChild(newTR);
-    }
+
+    const tempTR = document.createElement('tr')
+    createTempRow(tempTR, response.results)
+    tBody.append(tempTR)
+
+    const precipTR = document.createElement('tr')
+    createPrecipRow(precipTR, response.results)
+    tBody.append(precipTR)
+
+    const snowTR = document.createElement('tr')
+    createSnowRow(snowTR, response.results)
+    tBody.append(snowTR)
+    // for (let i = 0; i < response.results.length; i++) {
+    //     const newTR = document.createElement("tr");
+    //     createRow(newTR, response.results[i]);
+    //     newTR.className = "smushed-row"
+    //     tBody.appendChild(newTR);
+    // }
     table.appendChild(tBody);
 }
 
