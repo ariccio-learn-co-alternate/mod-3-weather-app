@@ -9,7 +9,9 @@ const MONTHS = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.",
     "Sep.", "Oct.", "Nov.", "Dec."];
 
 let chart = null;
-let curMarker = null
+let clickMarker = null
+let curStationMarker = null;
+
 function createCity(station) {
     const cityP = document.createElement("p");
     cityP.innerText = `City: ${station.city}`;
@@ -24,12 +26,12 @@ function createState(station) {
     return stateP;
 }
 
-function createStationID(station) {
-    const stationIDP = document.createElement("p");
-    stationIDP.innerText = `station ID: ${station.id}`;
-    stationIDP.id = `${BASE_YOUR_STATION_ID}-id`;
-    return stationIDP;
-}
+// function createStationID(station) {
+//     const stationIDP = document.createElement("p");
+//     stationIDP.innerText = `station ID: ${station.id}`;
+//     stationIDP.id = `${BASE_YOUR_STATION_ID}-id`;
+//     return stationIDP;
+// }
 
 function createStationLat(station) {
     const latP = document.createElement("p");
@@ -45,12 +47,12 @@ function createStationLong(station) {
     return longP;
 }
 
-function createStationNOAAID(station) {
-    const noaaIDP = document.createElement("p");
-    noaaIDP.innerText = `noaa_id: ${station.noaa_id}`;
-    noaaIDP.id = `${BASE_YOUR_STATION_ID}-noaa-id`;
-    return noaaIDP;
-}
+// function createStationNOAAID(station) {
+//     const noaaIDP = document.createElement("p");
+//     noaaIDP.innerText = `noaa_id: ${station.noaa_id}`;
+//     noaaIDP.id = `${BASE_YOUR_STATION_ID}-noaa-id`;
+//     return noaaIDP;
+// }
 
 function renderStationSubDiv(station) {
     const newDiv = document.createElement("div");
@@ -70,10 +72,10 @@ function renderStationSubDiv(station) {
     // Station location data:
     newDiv.appendChild(createCity(station));
     newDiv.appendChild(createState(station));
-    newDiv.appendChild(createStationID(station));
+    // newDiv.appendChild(createStationID(station));
     newDiv.appendChild(createStationLat(station));
     newDiv.appendChild(createStationLong(station));
-    newDiv.appendChild(createStationNOAAID(station));
+    // newDiv.appendChild(createStationNOAAID(station));
 
     return newDiv;
 }
@@ -106,21 +108,51 @@ function fetchStationURL(event) {
     return `${BASE_SERVER_PATH}/stations/${btoa(JSON.stringify(body))}`;
 }
 
-function mapClick(event) {
-    if (curMarker) {
-        curMarker.setMap(null)
+function renderYear(response, graphDatatypeInput) {
+    console.log(response);
+    slapYearDataOnDOM(response);
+    if (chart == null) {
+        chart = new Chart(graphCanvas2dCtx(), chartConfig(response, graphDatatypeInput));
     }
-    curMarker = new google.maps.Marker({
+    else {
+        chart.destroy();
+        chart = new Chart(graphCanvas2dCtx(), chartConfig(response, graphDatatypeInput));
+    }
+    // document.getElementById("graph-temperature-button").addEventListener('click', )
+}
+
+function makeClickMarker(event) {
+    if (clickMarker) {
+        clickMarker.setMap(null)
+    }
+    clickMarker = new google.maps.Marker({
         position: event.latLng,
         map: map,
-        title: 'Current Selection'
+        title: 'Current Selection',
+        label: "C"
     });
+}
+
+function makeStationMarker(response) {
+    if (curStationMarker) {
+        curStationMarker.setMap(null)
+    }
+    curStationMarker = new google.maps.Marker({
+        position: new google.maps.LatLng(response.latitude, response.longitude),
+        map: map,
+        title: 'Current Station',
+        label: 'S'
+    });
+}
+
+function mapClick(event) {
+    makeClickMarker(event)
     fetch(fetchStationURL(event))
         .then(res => res.json()).then(response => {
             console.log(response);
             const chartHolder = document.querySelector('#monthly-data-table-wrapper')
             chartHolder.innerHTML = ""
-
+            makeStationMarker(response)
             if (chart) {
                 chart.destroy()
                 chart = null
@@ -131,10 +163,6 @@ function mapClick(event) {
 
         }
         )
-
-}
-
-function clearMarkers() {
 
 }
 

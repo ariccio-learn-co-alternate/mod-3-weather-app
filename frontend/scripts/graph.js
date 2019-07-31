@@ -56,21 +56,6 @@ function chartConfig(response, graphDatatypeInput) {
     return config;
 }
 
-function renderYear(response, graphDatatypeInput) {
-    console.log(response);
-    slapYearDataOnDOM(response);
-    if (chart == null) {
-        chart = new Chart(graphCanvas2dCtx(), chartConfig(response, graphDatatypeInput));
-    }
-    else {
-        chart.destroy();
-        chart = new Chart(graphCanvas2dCtx(), chartConfig(response, graphDatatypeInput));
-    }
-    // document.getElementById("graph-temperature-button").addEventListener('click', )
-}
-
-
-
 function graphCanvas2dCtx() {
     const graphCanvas = document.getElementById("graph-canvas");
     const graphCanvasCtx = graphCanvas.getContext('2d');
