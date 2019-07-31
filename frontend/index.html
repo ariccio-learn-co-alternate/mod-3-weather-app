@@ -49,41 +49,85 @@
     <link rel="stylesheet" href="styles/index.css" />
   </head>
   <body>
-    <h2>Click a location:</h2>
-    <div id="map-wrapper">
-      <div id="map" width="100%" height="100px"></div>
+    <br />
+    <div class="container">
+      <div class="row">
+        <div class="col-sm text-center">
+          <h1>Click a location</h1>
+        </div>
+        <div class="col-3"></div>
+      </div>
+      <div class="row">
+        <div id="map" class="col-sm"></div>
+        <div class="col-3">
+          <form class="input-box" hidden id="year-input-box-form">
+            <div class="form-group">
+              <h3>Select a year</h3>
+              <br />
+              <input
+                class="form-control"
+                type="number"
+                name="year"
+                min="1950"
+                max="2000"
+                id="year-field-id"
+              />
+              <br />
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="graph_datatype_input"
+                  value="mean_temp"
+                  id="graph-temperature-input"
+                />
+                <label class="form-check-label" for="graph-temperature-input"
+                  >Temperature</label
+                >
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="graph_datatype_input"
+                  value="total_precip"
+                  id="graph-precipitation-input"
+                />
+                <label class="form-check-label" for="graph-precipitation-input"
+                  >Precipitation</label
+                >
+              </div>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="graph_datatype_input"
+                  value="total_snow"
+                  id="graph-snow-input"
+                />
+                <label class="form-check-label" for="graph-snow-input"
+                  >Snow</label
+                >
+              </div>
+              <br />
+              <input
+                type="submit"
+                class="btn btn-primary"
+                value="Lookup Year"
+              />
+            </div>
+          </form>
+          <hr />
+          <div id="station-data"></div>
+        </div>
+      </div>
     </div>
 
-    <div class="wrapper" id="lower-half-wrapper">
-      <div id="station-data"></div>
-
-      <form
-        class="input-box"
-        action="#"
-        method="post"
-        hidden
-        id="year-input-box-form"
-      >
-        <h3>Select a year</h3>
-        <input
-          type="number"
-          name="year"
-          min="1950"
-          max="2000"
-          id="year-field-id"
-        />
-        <input type="radio" name="graph_datatype_input" value="mean_temp" id="graph-temperature-input">Temperature<br>
-        <input type="radio" name="graph_datatype_input" value="total_precip" id="graph-precipitation-input">Precipitation<br>
-        <input type="radio" name="graph_datatype_input" value="total_snow" id="graph-snow-input">Snow</br>
-      <input type="submit" name="" value="lookup year" />
-      </form>
+    <div id="monthly-data-table-wrapper"></div>
+    <div id="graph-holder">
+      <canvas id="graph-canvas"></canvas>
     </div>
 
-
-        <div id="monthly-data-table-wrapper"></div>
-        <div id="graph-holder"><canvas id="graph-canvas"></canvas></div>
-
-    </div>
     <!-- <iframe width="600" height="450" frameborder="0" style="border:0" src="" allowfullscreen></iframe> -->
   </body>
 </html>

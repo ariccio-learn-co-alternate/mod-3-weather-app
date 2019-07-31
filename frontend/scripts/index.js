@@ -9,7 +9,7 @@ const MONTHS = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.",
     "Sep.", "Oct.", "Nov.", "Dec."];
 
 let chart = null;
-
+let curMarker = null
 function createCity(station) {
     const cityP = document.createElement("p");
     cityP.innerText = `City: ${station.city}`;
@@ -107,6 +107,14 @@ function fetchStationURL(event) {
 }
 
 function mapClick(event) {
+    if (curMarker) {
+        curMarker.setMap(null)
+    }
+    curMarker = new google.maps.Marker({
+        position: event.latLng,
+        map: map,
+        title: 'Current Selection'
+    });
     fetch(fetchStationURL(event))
         .then(res => res.json()).then(response => {
             console.log(response);
@@ -123,6 +131,10 @@ function mapClick(event) {
 
         }
         )
+
+}
+
+function clearMarkers() {
 
 }
 

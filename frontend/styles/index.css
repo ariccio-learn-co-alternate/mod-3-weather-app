@@ -4,12 +4,6 @@
   text-align: center;
 }
 
-#map {
-    height: 50%;
-    width: 50%;
-    display: inline-block;
-}
-
 /* Optional: Makes the sample page fill the window. */
 html, body {
   height: 100%;
@@ -40,3 +34,13 @@ html, body {
   grid-column: 2;
   grid-row: 1;
 }
+
+#graph-holder {
+  position: relative; height:50%; width:90%;
+  margin-left: 5%;
+}
+
+/* #graph-canvas {
+  display: inline-block;
+} */
+

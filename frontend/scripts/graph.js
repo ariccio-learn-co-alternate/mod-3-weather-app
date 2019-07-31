@@ -31,7 +31,9 @@ function chartConfig(response, graphDatatypeInput) {
             ]
         },
         options: {
+
             responsive: true,
+            maintainAspectRatio: false,
             title: {
                 display: true,
                 text: `Data for ${response.meta.noaa_id}`
