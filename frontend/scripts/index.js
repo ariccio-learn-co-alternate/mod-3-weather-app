@@ -145,30 +145,25 @@ function makeStationMarker(response) {
     });
 }
 
-function renderChartTableAndMapMarker(response) {
-    console.log(response);
-    const chartHolder = document.querySelector('#monthly-data-table-wrapper')
-    chartHolder.innerHTML = ""
-    makeStationMarker(response)
-    if (chart) {
-        chart.destroy()
-        chart = null
-        document.querySelector('#graph-holder').innerHTML = ""
-    }
-    appendStationInfo(response);
-}
-
-async function mapClick(event) {
+function mapClick(event) {
     makeClickMarker(event)
-    try {
-        const res = await fetch(fetchStationURL(event));
-        const response = res.json();
-        renderChartTableAndMapMarker(response);
-    }
-    catch (error) {
-        console.log('map click fetch failed? error: ' + error);
-        alert('Fetching from server failed. Check connection? ' + error.message);
-    }
+    fetch(fetchStationURL(event))
+        .then(res => res.json()).then(response => {
+            console.log(response);
+            const chartHolder = document.querySelector('#monthly-data-table-wrapper')
+            chartHolder.innerHTML = ""
+            makeStationMarker(response)
+            document.querySelector('#divider').hidden = false;
+            if (chart) {
+                chart.destroy()
+                chart = null
+                document.querySelector('#graph-canvas').innerHTML = ""
+            }
+
+            appendStationInfo(response);
+
+        }
+        )
 
 }
 
@@ -339,7 +334,7 @@ function yearFormHandler(event) {
     console.log(`user wants data for year ${userYear}`);
     fetch(fetchYearURL(event.target, userYear)).then(res => res.json()).then(response => {
         renderYear(response, event.target.graph_datatype_input.value);
-    }).catch(error => alert(error))
+    })
 }
 // I know it's not C++, don't @ me bro.
 function main() {
