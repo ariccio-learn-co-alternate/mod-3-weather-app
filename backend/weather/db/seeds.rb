@@ -21,7 +21,7 @@ JSON.parse(resp)['results'].each do |station|
   city = unparsed_name.split(',')[0].titleize
   state = unparsed_name.split(',')[1].split[0]
 
-  Station.create(
+  Station.first_or_create!(
     noaa_id: station['id'],
     latitude: station['latitude'],
     longitude: station['longitude'],
