@@ -22,12 +22,13 @@ function axesWithLabel(label) {
 
 function chartConfig(response, graphDatatypeInput) {
     // based on sample code: https://github.com/chartjs/Chart.js/blob/master/samples/charts/line/basic.html
+    let dataTypeString = graphDatatypeInput.replace('_', ' ');
     const config = {
         type: 'line',
         data: {
             labels: MONTHS,
             datasets: [
-                datasetFromResponse(response, graphDatatypeInput, graphDatatypeInput)
+                datasetFromResponse(response, dataTypeString, graphDatatypeInput)
             ]
         },
         options: {
@@ -36,7 +37,7 @@ function chartConfig(response, graphDatatypeInput) {
             maintainAspectRatio: false,
             title: {
                 display: true,
-                text: `Data for ${response.meta.noaa_id}`
+                text: `Data for ${response.meta.city}, ${response.meta.state}`
             },
             tooltips: {
                 mode: 'index',
@@ -48,7 +49,7 @@ function chartConfig(response, graphDatatypeInput) {
             },
             scales: {
                 xAxes: [axesWithLabel('month')],
-                yAxes: [axesWithLabel(graphDatatypeInput)]
+                yAxes: [axesWithLabel(dataTypeString)]
             }
         }
     };

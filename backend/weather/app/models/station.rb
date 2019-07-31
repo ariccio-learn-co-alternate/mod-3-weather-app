@@ -64,7 +64,12 @@ class Station < ApplicationRecord
         results[index]["total_snow"] = datum["value"]
       end
     end
-    { "meta" => { "year" => year, "noaa_id" => noaa_id },
+    { "meta" => {
+        "year" => year,
+        "noaa_id" => noaa_id,
+        "city" => city,
+        "state" => state
+        },
       "results" => results }
   end
 end
