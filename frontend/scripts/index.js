@@ -153,10 +153,11 @@ function mapClick(event) {
             const chartHolder = document.querySelector('#monthly-data-table-wrapper')
             chartHolder.innerHTML = ""
             makeStationMarker(response)
+            document.querySelector('#divider').hidden = false;
             if (chart) {
                 chart.destroy()
                 chart = null
-                document.querySelector('#graph-holder').innerHTML = ""
+                document.querySelector('#graph-canvas').innerHTML = ""
             }
 
             appendStationInfo(response);

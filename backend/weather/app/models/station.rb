@@ -1,23 +1,8 @@
 # frozen_string_literal: true
 
-MONTHS = [
-  { month: 'January' },
-  { month: 'February' },
-  { month: 'March' },
-  { month: 'April' },
-  { month: 'May' },
-  { month: 'June' },
-  { month: 'July' },
-  { month: 'August' },
-  { month: 'September' },
-  { month: 'October' },
-  { month: 'November' },
-  { month: 'December' }
-]
-
 class Station < ApplicationRecord
-  Dotenv.load('api_key.env')
-  @@api_key = ENV['API_KEY']
+  Dotenv.load("api_key.env")
+  @@api_key = ENV["API_KEY"]
   def self.haversine_distance(lat1, lon1, lat2, lon2)
     # Get latitude and longitude
 
@@ -42,38 +27,51 @@ class Station < ApplicationRecord
   end
 
   def build_query_url(year)
-    "https://www.ncdc.noaa.gov/cdo-web/api/v2/data/?datasetid=GHCNDMS&stationid=#{noaa_id}&startdate=#{year}-01-01&enddate=#{year + 1}-01-01&datatypeid=MNTM&datatypeid=TSNW&datatypeid=TPCP&units=standard&limit=36"
+    "https://www.ncdc.noaa.gov/cdo-web/api/v2/data/?datasetid=GHCNDMS&stationid=#{noaa_id}&startdate=#{year}-01-01&enddate=#{year}-12-31&datatypeid=MNTM&datatypeid=TSNW&datatypeid=TPCP&units=standard&limit=36"
   end
 
-  def build_base_weather_array
-    MONTHS
+  def build_base_hash
+    months = [
+      { month: "January" },
+      { month: "February" },
+      { month: "March" },
+      { month: "April" },
+      { month: "May" },
+      { month: "June" },
+      { month: "July" },
+      { month: "August" },
+      { month: "September" },
+      { month: "October" },
+      { month: "November" },
+      { month: "December" }
+    ]
+    months
   end
 
   def get_weather(year)
     url = build_query_url(year)
-    resp = RestClient::Request.execute(url: url, method: 'GET', headers: { token: @@api_key })
-
-    results = build_base_weather_array
-    weather_results_for_year = JSON.parse(resp)['results']
+    resp = RestClient::Request.execute(url: url, method: "GET", headers: { token: @@api_key })
+    results = build_base_hash
+    weather_results_for_year = JSON.parse(resp)["results"]
     weather_results_for_year.each do |datum|
-      index = Date.parse(datum['date'].split('T')[0]).month - 1
-      case datum['datatype']
-      when 'MNTM'
-        results[index]['mean_temp'] = datum['value']
-      when 'TPCP'
-        results[index]['total_precip'] = datum['value']
-      when 'TSNW'
-        results[index]['total_snow'] = datum['value']
+      index = Date.parse(datum["date"].split("T")[0]).month - 1
+      case datum["datatype"]
+      when "MNTM"
+        results[index]["mean_temp"] = datum["value"]
+      when "TPCP"
+        results[index]["total_precip"] = datum["value"]
+      when "TSNW"
+        results[index]["total_snow"] = datum["value"]
       end
     end
     {
-      'meta' => {
-        'year' => year,
-        'noaa_id' => noaa_id,
-        'city' => city,
-        'state' => state
+      "meta" => {
+        "year" => year,
+        "noaa_id" => noaa_id,
+        "city" => city,
+        "state" => state
       },
-      'results' => results
+      "results" => results
     }
   end
 end
