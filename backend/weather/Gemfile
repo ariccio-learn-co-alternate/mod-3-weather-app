@@ -5,7 +5,21 @@ ruby '2.6.1'
 gem 'rest-client'
 gem "dotenv"
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.2.3'
+# gem 'rails', '~> 5.2.3'
+
+# Thank you: https://blog.sundaycoding.com/blog/2016/08/10/how-to-remove-action-cable-from-a-rails-app/
+gem "activerecord", '= 5.2.3'
+gem "activemodel", '= 5.2.3'
+gem "actionpack", '= 5.2.3'
+gem "actionview", '= 5.2.3'
+gem "activestorage", '= 5.2.3'
+# gem "actionmailer"
+gem "activejob", '= 5.2.3'
+gem "activesupport", '= 5.2.3'
+gem "railties", '= 5.2.3'
+gem "sprockets-rails", '>= 2.0.0'
+
+
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
 # Use Puma as the app server

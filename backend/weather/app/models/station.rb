@@ -1,3 +1,18 @@
+MONTHS = [
+  {month: "January"},
+  {month: "February"},
+  {month: "March"},
+  {month: "April"},
+  {month: "May"},
+  {month: "June"},
+  {month: "July"},
+  {month: "August"},
+  {month: "September"},
+  {month: "October"},
+  {month: "November"},
+  {month: "December"},
+]
+
 class Station < ApplicationRecord
   Dotenv.load("api_key.env")
   @@api_key = ENV["API_KEY"]
@@ -29,25 +44,7 @@ class Station < ApplicationRecord
   end
 
   def build_base_weather_array
-    base_array = []
-    months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ]
-    months.each do |month|
-      base_array << { month: month }
-    end
-    base_array
+    MONTHS
   end
 
   def get_weather(year)
