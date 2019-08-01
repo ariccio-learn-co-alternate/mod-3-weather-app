@@ -1,24 +1,5 @@
 # frozen_string_literal: true
 
-def sensible_year(year)
-    # 81 years of forward compatibility
-  if year > 2100
-    return false
-  elsif year < 0
-    return false
-  end
-  return true
-end
-
-def sensible_month?(month)
-  if month > 12
-    return false
-  elsif month < 0
-    return false
-  end
-  return true
-end
-
 def haversine_distance_module(lat1, lon1, lat2, lon2)
   # Get latitude and longitude
 
@@ -116,31 +97,39 @@ class Station < ApplicationRecord
     }
   end
 
+  def build_return_hash_daily(year, month, results, errors)
+    {
+      "meta" => {
+        "year" => year,
+        "month" => month,
+        "noaa_id" => noaa_id,
+        "city" => city,
+        "state" => state
+      },
+      "results" => results,
+      "errors" => errors
+    }
+
+  end
 
   def get_monthly_weather(year)
     errors = []
-    if !sensible_year(year)
-      errors << "Invalid year `#{year}`."
-    end
+
     url = build_monthly_query_url(year)
     resp = RestClient::Request.execute(url: url, method: "GET", headers: { token: @@api_key })
     results = build_base_monthly_hash
     parsed = JSON.parse(resp)
     weather_results_for_year = parsed["results"]
-    parse_monthly_results(results, weather_results_for_year)
-
+    if weather_results_for_year == nil
+      errors << "Empty results for #{noaa_id}"
+    else
+      parse_monthly_results(results, weather_results_for_year)
+    end
     build_return_hash_monthly(year, results, errors)
   end
 
   def get_daily_weather(year, month)
     errors = []
-    if !sensible_year(year)
-      errors << "Invalid year `#{year}`."
-    end
-
-    if !sensible_month?(month)
-      errors << "Invalid month `#{month}`"
-    end
 
     start_date = Date.civil(year, month, 1)
     end_date = Date.civil(year, month, -1)
@@ -158,16 +147,6 @@ class Station < ApplicationRecord
       { day: date.day }
     end
     parse_daily_results(results, weather_results_for_month)
-    {
-      "meta" => {
-        "year" => year,
-        "month" => month,
-        "noaa_id" => noaa_id,
-        "city" => city,
-        "state" => state
-      },
-      "results" => results,
-      "errors" => errors
-    }
+    build_return_hash_daily(year, month, results, errors)
   end
 end
