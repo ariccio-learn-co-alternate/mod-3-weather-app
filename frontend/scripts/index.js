@@ -9,7 +9,6 @@ const MONTHS = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.",
     "Sep.", "Oct.", "Nov.", "Dec."];
 
 let chart = null;
-let clickMarker = null
 let curStationMarker = null;
 let curHighlightedMonthCell = null;
 
@@ -127,17 +126,6 @@ function renderYear(response, graphDatatypeInput) {
     // document.getElementById("graph-temperature-button").addEventListener('click', )
 }
 
-function makeClickMarker(event) {
-    if (clickMarker) {
-        clickMarker.setMap(null)
-    }
-    clickMarker = new google.maps.Marker({
-        position: event.latLng,
-        map: map,
-        title: 'Current Selection',
-        label: "C"
-    });
-}
 
 function makeStationMarker(response) {
     if (curStationMarker) {
@@ -152,7 +140,6 @@ function makeStationMarker(response) {
 }
 
 function mapClick(event) {
-    makeClickMarker(event)
     document.querySelector('#instructions-for-table').hidden = true
     fetch(fetchStationURL(event))
         .then(res => res.json()).then(response => {
@@ -233,6 +220,14 @@ function topRow(year, noaa_id) {
     const corner = document.createElement('th');
     corner.innerText = `Monthly Data for ${year}`
     corner.id = "table-corner"
+    corner.addEventListener('click', function (e) {
+        if (curHighlightedMonthCell != null) {
+            curHighlightedMonthCell.className = ""
+            curHighlightedMonthCell = null
+            clearTableColor()
+        }
+        rerenderChart()
+    })
     headerTR.appendChild(corner)
     MONTHS.forEach(
         function (month) {
@@ -246,6 +241,18 @@ function topRow(year, noaa_id) {
     headerTR.dataset.year = year
     headerTR.addEventListener('click', submitMonthData)
     return headerTR;
+}
+
+function rerenderChart() {
+    const yearForm = document.querySelector('#year-input-box-form')
+    const graphDatatypeInput = yearForm.graph_datatype_input.value
+    const userYear = parseInt(yearForm.year.value);
+    console.log(`user wants data for year ${userYear}`);
+    fetch(fetchYearURL(yearForm, userYear)).then(res => res.json()).then(response => {
+        chart.destroy();
+        chart = new Chart(graphCanvas2dCtx(), chartConfig(response, graphDatatypeInput));
+        window.scrollTo(0, document.body.scrollHeight);
+    })
 }
 
 function submitMonthData(event) {
