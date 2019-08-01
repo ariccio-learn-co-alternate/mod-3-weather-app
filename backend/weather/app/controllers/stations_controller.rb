@@ -13,6 +13,6 @@ class StationsController < ApplicationController
   def query_daily_weather
     noaa_id_year_month = JSON.parse(Base64.urlsafe_decode64(params[:noaa_id_year_month]))
     station = Station.find_by(noaa_id: noaa_id_year_month["noaa_id"])
-    render json: station.get_monthly_weather(noaa_id_year_month["year"], noaa_id_year_month["month"])
+    render json: station.get_daily_weather(noaa_id_year_month["year"].to_i, noaa_id_year_month["month"].to_i)
   end
 end

@@ -11,6 +11,7 @@ const MONTHS = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.",
 let chart = null;
 let clickMarker = null
 let curStationMarker = null;
+let curHighlightedMonthCell = null;
 
 function createCity(station) {
     const cityP = document.createElement("p");
@@ -181,7 +182,7 @@ function findOldTableAndEmptyOrCreateEmptyTable(id, div) {
     const table = document.querySelector(`#${id}`);
     if (!table) {
         const newTable = document.createElement("table");
-        newTable.className = 'table table-dark table-hover smushed-table';
+        newTable.className = 'table table-dark smushed-table';
         newTable.id = id;
         const divToAddTo = document.querySelector(`#${div}`);
         divToAddTo.appendChild(newTable);
@@ -205,7 +206,7 @@ function findOldTableAndEmptyOrCreateEmptyTable(id, div) {
 // }
 
 
-function topRow(year) {
+function topRow(year, noaa_id) {
     // const headerTR = document.createElement("tr");
     // const monthTH = document.createElement("th");
     // monthTH.innerText = "Month";
@@ -230,11 +231,70 @@ function topRow(year) {
         function (month) {
             const header = document.createElement("th");
             header.innerText = month;
+            header.dataset.monthNum = MONTHS.indexOf(month) + 1
             headerTR.appendChild(header)
         }
     )
+    headerTR.dataset.noaaId = noaa_id
+    headerTR.dataset.year = year
+    headerTR.addEventListener('click', submitMonthData)
     return headerTR;
 }
+
+function submitMonthData(event) {
+    const cell = event.target
+    if (cell.dataset.monthNum != null) {
+
+        if (curHighlightedMonthCell != null) {
+            curHighlightedMonthCell.className = ""
+            clearTableColor()
+        }
+
+        curHighlightedMonthCell = cell
+
+        highlightCol(cell)
+
+
+        const month = cell.dataset.monthNum
+        const noaaId = cell.parentNode.dataset.noaaId
+        const year = cell.parentNode.dataset.year
+        const body = {
+            noaa_id: noaaId,
+            year: year,
+            month: month
+        };
+        const url = `${BASE_SERVER_PATH}/weather/daily/${btoa(JSON.stringify(body))}`
+        fetch(url).then(res => res.json()).then(dailyData => renderDailyChart(dailyData))
+    }
+
+}
+
+function highlightCol(cell) {
+    cell.className = "bg-primary"
+
+    const tBody = document.querySelector('tbody')
+
+    tBody.childNodes.forEach(
+        function (row) {
+            row.childNodes[cell.dataset.monthNum].className = "bg-primary"
+        }
+    )
+}
+
+function clearTableColor() {
+    const tBody = document.querySelector('tbody')
+    tBody.childNodes.forEach(
+        function (row) {
+            row.childNodes.forEach(
+                function (cell) {
+                    cell.className = ""
+                }
+            )
+        }
+    )
+}
+
+
 
 function createTempRow(newTR, results) {
     const firstCell = document.createElement('td')
@@ -303,7 +363,7 @@ function slapYearDataOnDOM(response) {
     // tHead.colSpan = 13
     // table.appendChild(tHead);
 
-    table.appendChild(topRow(response.meta.year));
+    table.appendChild(topRow(response.meta.year, response.meta.noaa_id));
 
     const tBody = document.createElement("tbody");
 
@@ -327,6 +387,9 @@ function slapYearDataOnDOM(response) {
     table.appendChild(tBody);
 }
 
+function renderDailyChart(response) {
+    console.log(response);
+}
 
 function yearFormHandler(event) {
     event.preventDefault();
