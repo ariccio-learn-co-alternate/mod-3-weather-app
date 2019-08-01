@@ -26,11 +26,11 @@ class Station < ApplicationRecord
     end
   end
 
-  def build_query_url(year)
+  def build_monthly_query_url(year)
     "https://www.ncdc.noaa.gov/cdo-web/api/v2/data/?datasetid=GHCNDMS&stationid=#{noaa_id}&startdate=#{year}-01-01&enddate=#{year}-12-31&datatypeid=MNTM&datatypeid=TSNW&datatypeid=TPCP&units=standard&limit=36"
   end
 
-  def build_base_hash
+  def build_base_monthly_hash
     months = [
       { month: "January" },
       { month: "February" },
@@ -48,10 +48,10 @@ class Station < ApplicationRecord
     months
   end
 
-  def get_weather(year)
-    url = build_query_url(year)
+  def get_monthly_weather(year)
+    url = build_monthly_query_url(year)
     resp = RestClient::Request.execute(url: url, method: "GET", headers: { token: @@api_key })
-    results = build_base_hash
+    results = build_base_monthly_hash
     weather_results_for_year = JSON.parse(resp)["results"]
     weather_results_for_year.each do |datum|
       index = Date.parse(datum["date"].split("T")[0]).month - 1
@@ -67,6 +67,39 @@ class Station < ApplicationRecord
     {
       "meta" => {
         "year" => year,
+        "noaa_id" => noaa_id,
+        "city" => city,
+        "state" => state
+      },
+      "results" => results
+    }
+  end
+
+  def get_daily_weather(year, month)
+    start_date = Date.civil(year, month, 1)
+    end_date = Date.civil(year, month, -1)
+
+    url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/data/?datasetid=GHCND&stationid=#{noaa_id}&startdate=#{start_date.to_s}&enddate=#{end_date.to_s}&datatypeid=TMAX&datatypeid=TMIN&units=standard&limit=62"
+
+    resp = RestClient::Request.execute(url: url, method: "GET", headers: { token: @@api_key })
+    weather_results_for_month = JSON.parse(resp)
+    hash_iterator = start_date..end_date
+    results = hash_iterator.map do |date|
+      { day: date.day }
+    end
+    weather_results_for_month["results"].each do |datum|
+      index = Date.parse(datum["date"].split("T")[0]).day - 1
+      case datum["datatype"]
+      when "TMAX"
+        results[index]["max_temp"] = datum["value"]
+      when "TMIN"
+        results[index]["min_temp"] = datum["value"]
+      end
+    end
+    {
+      "meta" => {
+        "year" => year,
+        "month" => month,
         "noaa_id" => noaa_id,
         "city" => city,
         "state" => state
