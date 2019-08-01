@@ -157,6 +157,8 @@ function mapClick(event) {
             appendStationInfo(response);
 
         }
+        ).catch(
+            _ => alert("NOAA sent back bad data. Try another location or time span.")
         )
 
 }
@@ -252,7 +254,9 @@ function rerenderChart() {
         chart.destroy();
         chart = new Chart(graphCanvas2dCtx(), chartConfig(response, graphDatatypeInput));
         window.scrollTo(0, document.body.scrollHeight);
-    })
+    }).catch(
+        _ => alert("NOAA sent back bad data. Try another location or time span.")
+    )
 }
 
 function submitMonthData(event) {
@@ -277,7 +281,9 @@ function submitMonthData(event) {
             month: month
         };
         const url = `${BASE_SERVER_PATH}/weather/daily/${btoa(JSON.stringify(body))}`
-        fetch(url).then(res => res.json()).then(dailyData => renderDailyChart(dailyData))
+        fetch(url).then(res => res.json()).then(dailyData => renderDailyChart(dailyData)).catch(
+            _ => alert("NOAA sent back bad data. Try another location or time span.")
+        )
     }
 
 }
@@ -383,8 +389,7 @@ function createSnowRow(newTR, results) {
 
 function slapYearDataOnDOM(response) {
     const table = findOldTableAndEmptyOrCreateEmptyTable(MONTHLY_DATA_TABLE_ID, MONTHLY_DATA_TABLE_WRAPPER);
-    const directions = document.querySelector('#instructions-for-table')
-    directions.hidden = false;
+
     // const tHead = document.createElement('th')
     // tHead.colSpan = 13
     // table.appendChild(tHead);
@@ -432,7 +437,11 @@ function yearFormHandler(event) {
     console.log(`user wants data for year ${userYear}`);
     fetch(fetchYearURL(event.target, userYear)).then(res => res.json()).then(response => {
         renderYear(response, event.target.graph_datatype_input.value);
-    })
+        const directions = document.querySelector('#instructions-for-table')
+        directions.hidden = false;
+    }).catch(
+        _ => alert("NOAA sent back bad data. Try another location or time span.")
+    )
 }
 // I know it's not C++, don't @ me bro.
 function main() {
