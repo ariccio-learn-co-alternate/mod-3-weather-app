@@ -133,20 +133,20 @@ class Station < ApplicationRecord
 
     start_date = Date.civil(year, month, 1)
     end_date = Date.civil(year, month, -1)
+    hash_iterator = start_date..end_date
+    results = hash_iterator.map do |date|
+      { day: date.day }
+    end
 
     url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/data/?datasetid=GHCND&stationid=#{noaa_id}&startdate=#{start_date.to_s}&enddate=#{end_date.to_s}&datatypeid=TMAX&datatypeid=TMIN&units=standard&limit=62"
 
     resp = RestClient::Request.execute(url: url, method: "GET", headers: { token: @@api_key })
     weather_results_for_month = JSON.parse(resp)
-    if weather_results_for_month.empty?
-
+    if weather_results_for_month == nil
+      errors << "Empty results for #{noaa_id}"
+    else
+      parse_daily_results(results, weather_results_for_month)
     end
-
-    hash_iterator = start_date..end_date
-    results = hash_iterator.map do |date|
-      { day: date.day }
-    end
-    parse_daily_results(results, weather_results_for_month)
     build_return_hash_daily(year, month, results, errors)
   end
 end
