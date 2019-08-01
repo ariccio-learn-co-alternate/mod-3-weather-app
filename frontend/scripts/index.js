@@ -71,6 +71,9 @@ function renderStationSubDiv(station) {
     // updated_at: "2019-07-29T18:14:59.267Z"
 
     // Station location data:
+    const infoHeading = document.createElement('h3')
+    infoHeading.innerText = "Station Info"
+    newDiv.appendChild(infoHeading)
     newDiv.appendChild(createCity(station));
     newDiv.appendChild(createState(station));
     // newDiv.appendChild(createStationID(station));
@@ -114,10 +117,12 @@ function renderYear(response, graphDatatypeInput) {
     slapYearDataOnDOM(response);
     if (chart == null) {
         chart = new Chart(graphCanvas2dCtx(), chartConfig(response, graphDatatypeInput));
+        window.scrollTo(0, document.body.scrollHeight);
     }
     else {
         chart.destroy();
         chart = new Chart(graphCanvas2dCtx(), chartConfig(response, graphDatatypeInput));
+        window.scrollTo(0, document.body.scrollHeight);
     }
     // document.getElementById("graph-temperature-button").addEventListener('click', )
 }
@@ -148,6 +153,7 @@ function makeStationMarker(response) {
 
 function mapClick(event) {
     makeClickMarker(event)
+    document.querySelector('#instructions-for-table').hidden = true
     fetch(fetchStationURL(event))
         .then(res => res.json()).then(response => {
             console.log(response);
@@ -226,6 +232,7 @@ function topRow(year, noaa_id) {
     const headerTR = document.createElement("tr");
     const corner = document.createElement('th');
     corner.innerText = `Monthly Data for ${year}`
+    corner.id = "table-corner"
     headerTR.appendChild(corner)
     MONTHS.forEach(
         function (month) {
@@ -253,7 +260,6 @@ function submitMonthData(event) {
         curHighlightedMonthCell = cell
 
         highlightCol(cell)
-
 
         const month = cell.dataset.monthNum
         const noaaId = cell.parentNode.dataset.noaaId
@@ -303,7 +309,10 @@ function createTempRow(newTR, results) {
     results.forEach(
         function (result) {
             const cell = document.createElement('td')
-            cell.innerText = result.mean_temp
+            if (result.mean_temp === undefined) {
+                cell.innerText = "No Data"
+            }
+            else { cell.innerText = result.mean_temp }
             newTR.appendChild(cell)
         }
     )
@@ -316,7 +325,10 @@ function createPrecipRow(newTR, results) {
     results.forEach(
         function (result) {
             const cell = document.createElement('td')
-            cell.innerText = result.total_precip
+            if (result.total_precip === undefined) {
+                cell.innerText = "No Data"
+            }
+            else { cell.innerText = result.total_precip }
             newTR.appendChild(cell)
         }
     )
@@ -329,7 +341,12 @@ function createSnowRow(newTR, results) {
     results.forEach(
         function (result) {
             const cell = document.createElement('td')
-            cell.innerText = result.total_snow
+            if (result.total_snow === undefined) {
+                cell.innerText = "No Data"
+            }
+            else {
+                cell.innerText = result.total_snow
+            }
             newTR.appendChild(cell)
         }
     )
@@ -359,6 +376,8 @@ function createSnowRow(newTR, results) {
 
 function slapYearDataOnDOM(response) {
     const table = findOldTableAndEmptyOrCreateEmptyTable(MONTHLY_DATA_TABLE_ID, MONTHLY_DATA_TABLE_WRAPPER);
+    const directions = document.querySelector('#instructions-for-table')
+    directions.hidden = false;
     // const tHead = document.createElement('th')
     // tHead.colSpan = 13
     // table.appendChild(tHead);
@@ -391,10 +410,12 @@ function renderDailyChart(response) {
     console.log(response);
     if (chart == null) {
         chart = new Chart(graphCanvas2dCtx(), dailyChartConfig(response));
+        window.scrollTo(0, document.body.scrollHeight);
     }
     else {
         chart.destroy();
         chart = new Chart(graphCanvas2dCtx(), dailyChartConfig(response));
+        window.scrollTo(0, document.body.scrollHeight);
     }
 }
 

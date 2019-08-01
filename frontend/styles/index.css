@@ -4,6 +4,11 @@
   text-align: center;
 }
 
+
+*{
+  scroll-behavior: smooth;
+}
+
 /* Optional: Makes the sample page fill the window. */
 html, body {
   height: 100%;
@@ -11,7 +16,9 @@ html, body {
   padding: 0;
 }
 
-
+#instructions-for-table{
+  text-align: center;
+}
 .wrapper {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -24,6 +31,10 @@ html, body {
   grid-column: 1;
   grid-row: 1;
 
+}
+
+th:hover{
+  background-color: rgb(53,53,53)
 }
 
 #monthly-data-table-wrapper {

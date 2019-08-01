@@ -71,6 +71,7 @@
                 min="1950"
                 max="2000"
                 id="year-field-id"
+                value="1950"
               />
               <br />
               <div class="form-check">
@@ -80,6 +81,7 @@
                   name="graph_datatype_input"
                   value="mean_temp"
                   id="graph-temperature-input"
+                  checked
                 />
                 <label class="form-check-label" for="graph-temperature-input"
                   >Temperature</label
@@ -122,7 +124,10 @@
         </div>
       </div>
     </div>
-
+    <br />
+    <h2 id="instructions-for-table" hidden>
+      Click on a month name to get more data
+    </h2>
     <div id="monthly-data-table-wrapper"></div>
     <div id="graph-holder">
       <canvas id="graph-canvas"></canvas>
