@@ -174,7 +174,7 @@ function fetchYearURL(target, userYear) {
         noaa_id: target.dataset.noaa_id,
         year: userYear
     };
-    return `${BASE_SERVER_PATH}/weather/${btoa(JSON.stringify(body))}`;
+    return `${BASE_SERVER_PATH}/weather/monthly/${btoa(JSON.stringify(body))}`;
 }
 
 function findOldTableAndEmptyOrCreateEmptyTable(id, div) {
