@@ -389,6 +389,13 @@ function slapYearDataOnDOM(response) {
 
 function renderDailyChart(response) {
     console.log(response);
+    if (chart == null) {
+        chart = new Chart(graphCanvas2dCtx(), dailyChartConfig(response));
+    }
+    else {
+        chart.destroy();
+        chart = new Chart(graphCanvas2dCtx(), dailyChartConfig(response));
+    }
 }
 
 function yearFormHandler(event) {
