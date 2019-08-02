@@ -101,7 +101,6 @@ function mapClick(event) {
     document.querySelector('#instructions-for-table').hidden = true
     fetch(fetchStationURL(event))
         .then(res => res.json()).then(response => {
-            console.log(response);
             const chartHolder = document.querySelector('#monthly-data-table-wrapper')
             chartHolder.innerHTML = ""
             makeStationMarker(response)
@@ -133,7 +132,6 @@ function fetchYearURL(target, userYear) {
 
 // Called when user submits the form to the right of the map. Creates the table and chart.
 function renderYear(response, graphDatatypeInput) {
-    console.log(response);
     slapYearDataOnDOM(response);
     if (chart == null) {
         chart = new Chart(graphCanvas2dCtx(), chartConfig(response, graphDatatypeInput));
@@ -327,7 +325,6 @@ function rerenderChart() {
     const yearForm = document.querySelector('#year-input-box-form')
     const graphDatatypeInput = yearForm.graph_datatype_input.value
     const userYear = parseInt(yearForm.year.value);
-    console.log(`user wants data for year ${userYear}`);
     fetch(fetchYearURL(yearForm, userYear)).then(res => res.json()).then(response => {
         chart.destroy();
         chart = new Chart(graphCanvas2dCtx(), chartConfig(response, graphDatatypeInput));
@@ -339,7 +336,6 @@ function rerenderChart() {
 
 // Zooms in the chart to its daily state.
 function renderDailyChart(response) {
-    console.log(response);
     if (chart == null) {
         chart = new Chart(graphCanvas2dCtx(), dailyChartConfig(response));
         window.scrollTo(0, document.body.scrollHeight);
@@ -361,7 +357,6 @@ function main() {
 function yearFormHandler(event) {
     event.preventDefault();
     const userYear = parseInt(event.target.year.value);
-    console.log(`user wants data for year ${userYear}`);
     fetch(fetchYearURL(event.target, userYear)).then(res => res.json()).then(response => {
         renderYear(response, event.target.graph_datatype_input.value);
         const directions = document.querySelector('#instructions-for-table')

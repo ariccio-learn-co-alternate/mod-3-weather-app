@@ -1,3 +1,4 @@
+//
 function datasetFromResponse(response, label, key) {
 
     let color = 'black'
@@ -30,6 +31,7 @@ function axesWithLabel(label) {
     return axe;
 }
 
+// Main code to create the zoomed out chart
 function chartConfig(response, graphDatatypeInput) {
     // based on sample code: https://github.com/chartjs/Chart.js/blob/master/samples/charts/line/basic.html
     let dataTypeString = graphDatatypeInput.replace('_', ' ');
