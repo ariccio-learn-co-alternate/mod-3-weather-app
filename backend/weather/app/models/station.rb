@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class Station < ApplicationRecord
-  Dotenv.load("api_key.env")
-  @@api_key = ENV["API_KEY"]
+  Dotenv.load('api_key.env')
+  @@api_key = ENV['API_KEY']
   def self.haversine_distance(lat1, lon1, lat2, lon2)
     # Get latitude and longitude
 
@@ -32,46 +32,46 @@ class Station < ApplicationRecord
 
   def build_base_monthly_hash
     months = [
-      { month: "January" },
-      { month: "February" },
-      { month: "March" },
-      { month: "April" },
-      { month: "May" },
-      { month: "June" },
-      { month: "July" },
-      { month: "August" },
-      { month: "September" },
-      { month: "October" },
-      { month: "November" },
-      { month: "December" }
+      { month: 'January' },
+      { month: 'February' },
+      { month: 'March' },
+      { month: 'April' },
+      { month: 'May' },
+      { month: 'June' },
+      { month: 'July' },
+      { month: 'August' },
+      { month: 'September' },
+      { month: 'October' },
+      { month: 'November' },
+      { month: 'December' }
     ]
     months
   end
 
   def get_monthly_weather(year)
     url = build_monthly_query_url(year)
-    resp = RestClient::Request.execute(url: url, method: "GET", headers: { token: @@api_key })
+    resp = RestClient::Request.execute(url: url, method: 'GET', headers: { token: @@api_key })
     results = build_base_monthly_hash
-    weather_results_for_year = JSON.parse(resp)["results"]
+    weather_results_for_year = JSON.parse(resp)['results']
     weather_results_for_year.each do |datum|
-      index = Date.parse(datum["date"].split("T")[0]).month - 1
-      case datum["datatype"]
-      when "MNTM"
-        results[index]["mean_temp"] = datum["value"]
-      when "TPCP"
-        results[index]["total_precip"] = datum["value"]
-      when "TSNW"
-        results[index]["total_snow"] = datum["value"]
+      index = Date.parse(datum['date'].split('T')[0]).month - 1
+      case datum['datatype']
+      when 'MNTM'
+        results[index]['mean_temp'] = datum['value']
+      when 'TPCP'
+        results[index]['total_precip'] = datum['value']
+      when 'TSNW'
+        results[index]['total_snow'] = datum['value']
       end
     end
     {
-      "meta" => {
-        "year" => year,
-        "noaa_id" => noaa_id,
-        "city" => city,
-        "state" => state
+      'meta' => {
+        'year' => year,
+        'noaa_id' => noaa_id,
+        'city' => city,
+        'state' => state
       },
-      "results" => results
+      'results' => results
     }
   end
 
@@ -81,30 +81,30 @@ class Station < ApplicationRecord
 
     url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/data/?datasetid=GHCND&stationid=#{noaa_id}&startdate=#{start_date.to_s}&enddate=#{end_date.to_s}&datatypeid=TMAX&datatypeid=TMIN&units=standard&limit=62"
 
-    resp = RestClient::Request.execute(url: url, method: "GET", headers: { token: @@api_key })
+    resp = RestClient::Request.execute(url: url, method: 'GET', headers: { token: @@api_key })
     weather_results_for_month = JSON.parse(resp)
     hash_iterator = start_date..end_date
     results = hash_iterator.map do |date|
       { day: date.day }
     end
-    weather_results_for_month["results"].each do |datum|
-      index = Date.parse(datum["date"].split("T")[0]).day - 1
-      case datum["datatype"]
-      when "TMAX"
-        results[index]["max_temp"] = datum["value"]
-      when "TMIN"
-        results[index]["min_temp"] = datum["value"]
+    weather_results_for_month['results'].each do |datum|
+      index = Date.parse(datum['date'].split('T')[0]).day - 1
+      case datum['datatype']
+      when 'TMAX'
+        results[index]['max_temp'] = datum['value']
+      when 'TMIN'
+        results[index]['min_temp'] = datum['value']
       end
     end
     {
-      "meta" => {
-        "year" => year,
-        "month" => month,
-        "noaa_id" => noaa_id,
-        "city" => city,
-        "state" => state
+      'meta' => {
+        'year' => year,
+        'month' => month,
+        'noaa_id' => noaa_id,
+        'city' => city,
+        'state' => state
       },
-      "results" => results
+      'results' => results
     }
   end
 end
