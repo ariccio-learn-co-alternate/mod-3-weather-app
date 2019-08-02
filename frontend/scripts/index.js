@@ -8,10 +8,12 @@ const MONTHLY_DATA_TABLE_WRAPPER = "monthly-data-table-wrapper";
 const MONTHS = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.",
     "Sep.", "Oct.", "Nov.", "Dec."];
 
+//Gloal variables that need to be tracked across our code.
 let chart = null;
 let curStationMarker = null;
 let curHighlightedMonthCell = null;
 
+//The next 5 functions render information for the form that appears when the user clicks the map (yearly data form)
 function createCity(station) {
     const cityP = document.createElement("p");
     cityP.innerText = `City: ${station.city}`;
@@ -25,13 +27,6 @@ function createState(station) {
     stateP.id = `${BASE_YOUR_STATION_ID}-state`;
     return stateP;
 }
-
-// function createStationID(station) {
-//     const stationIDP = document.createElement("p");
-//     stationIDP.innerText = `station ID: ${station.id}`;
-//     stationIDP.id = `${BASE_YOUR_STATION_ID}-id`;
-//     return stationIDP;
-// }
 
 function createStationLat(station) {
     const latP = document.createElement("p");
@@ -47,62 +42,38 @@ function createStationLong(station) {
     return longP;
 }
 
-// function createStationNOAAID(station) {
-//     const noaaIDP = document.createElement("p");
-//     noaaIDP.innerText = `noaa_id: ${station.noaa_id}`;
-//     noaaIDP.id = `${BASE_YOUR_STATION_ID}-noaa-id`;
-//     return noaaIDP;
-// }
-
 function renderStationSubDiv(station) {
     const newDiv = document.createElement("div");
     newDiv.id = `${BASE_YOUR_STATION_ID}-data`;
 
-
-    // Example data:
-    // city: "Westchester Co Airport"
-    // created_at: "2019-07-29T18:14:59.267Z"
-    // id: 108
-    // latitude: 41.06694
-    // longitude: -73.7075
-    // noaa_id: "GHCND:USW00094745"
-    // state: "NY"
-    // updated_at: "2019-07-29T18:14:59.267Z"
-
-    // Station location data:
     const infoHeading = document.createElement('h3')
     infoHeading.innerText = "Station Info"
     newDiv.appendChild(infoHeading)
     newDiv.appendChild(createCity(station));
     newDiv.appendChild(createState(station));
-    // newDiv.appendChild(createStationID(station));
     newDiv.appendChild(createStationLat(station));
     newDiv.appendChild(createStationLong(station));
-    // newDiv.appendChild(createStationNOAAID(station));
 
     return newDiv;
 }
 
+//Unhides the yearly data form and keeps track of the station's unique ID
 function renderYearInputBox(station) {
     const oldForm = document.querySelector(`#${YEAR_INPUT_BOX_FORM_ID}`);
     oldForm.hidden = false;
     oldForm.dataset.noaa_id = station.noaa_id;
 }
 
+//Combines the above elements to create the yearly data form.
 function appendStationInfo(station) {
     const stationDataDiv = document.querySelector("#station-data");
     stationDataDiv.innerHTML = "";
     stationDataDiv.appendChild(renderStationSubDiv(station));
 
-    // precipitation,
-    // snow,
-    // average temp
-    // max temp
-    // min temp
-
     renderYearInputBox(station);
 }
 
+//Creates the URL for the fetch request to find the closest station.
 function fetchStationURL(event) {
     const body = {
         latitude: event.latLng.lat(),
@@ -111,22 +82,8 @@ function fetchStationURL(event) {
     return `${BASE_SERVER_PATH}/stations/${btoa(JSON.stringify(body))}`;
 }
 
-function renderYear(response, graphDatatypeInput) {
-    console.log(response);
-    slapYearDataOnDOM(response);
-    if (chart == null) {
-        chart = new Chart(graphCanvas2dCtx(), chartConfig(response, graphDatatypeInput));
-        window.scrollTo(0, document.body.scrollHeight);
-    }
-    else {
-        chart.destroy();
-        chart = new Chart(graphCanvas2dCtx(), chartConfig(response, graphDatatypeInput));
-        window.scrollTo(0, document.body.scrollHeight);
-    }
-    // document.getElementById("graph-temperature-button").addEventListener('click', )
-}
 
-
+// Generates the google maps marker for the closest station to the click
 function makeStationMarker(response) {
     if (curStationMarker) {
         curStationMarker.setMap(null)
@@ -139,6 +96,7 @@ function makeStationMarker(response) {
     });
 }
 
+// Complex function for processing the user's click on the map. Fetches info on the closest station, erases the table and chart (if present), generates the station marker, and slaps the info on the closest station on the DOM.
 function mapClick(event) {
     document.querySelector('#instructions-for-table').hidden = true
     fetch(fetchStationURL(event))
@@ -158,14 +116,14 @@ function mapClick(event) {
 
         }
         ).catch(
-            _ => alert("NOAA sent back bad data. Try another location or time span.")
+            _ => alert("Internal server error. Whoops!")
         )
 
 }
 
+//Generates the URL needed for the fetch request in the previous function.
 function fetchYearURL(target, userYear) {
-    // noaa_id : ...
-    // year : ...
+
     const body = {
         noaa_id: target.dataset.noaa_id,
         year: userYear
@@ -173,6 +131,44 @@ function fetchYearURL(target, userYear) {
     return `${BASE_SERVER_PATH}/weather/monthly/${btoa(JSON.stringify(body))}`;
 }
 
+// Called when user submits the form to the right of the map. Creates the table and chart.
+function renderYear(response, graphDatatypeInput) {
+    console.log(response);
+    slapYearDataOnDOM(response);
+    if (chart == null) {
+        chart = new Chart(graphCanvas2dCtx(), chartConfig(response, graphDatatypeInput));
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+    else {
+        chart.destroy();
+        chart = new Chart(graphCanvas2dCtx(), chartConfig(response, graphDatatypeInput));
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+}
+
+// Creates table. Called by renderYear().
+function slapYearDataOnDOM(response) {
+    const table = findOldTableAndEmptyOrCreateEmptyTable(MONTHLY_DATA_TABLE_ID, MONTHLY_DATA_TABLE_WRAPPER);
+
+    table.appendChild(topRow(response.meta.year, response.meta.noaa_id));
+
+    const tBody = document.createElement("tbody");
+
+    const tempTR = document.createElement('tr')
+    createTempRow(tempTR, response.results)
+    tBody.append(tempTR)
+
+    const precipTR = document.createElement('tr')
+    createPrecipRow(precipTR, response.results)
+    tBody.append(precipTR)
+
+    const snowTR = document.createElement('tr')
+    createSnowRow(snowTR, response.results)
+    tBody.append(snowTR)
+    table.appendChild(tBody);
+}
+
+// Finds an old table if present or makes a new one entirely (called by slapYearDataOnDom())
 function findOldTableAndEmptyOrCreateEmptyTable(id, div) {
     const table = document.querySelector(`#${id}`);
     if (!table) {
@@ -187,37 +183,10 @@ function findOldTableAndEmptyOrCreateEmptyTable(id, div) {
     return table;
 }
 
-// function newTableHeader(headerText) {
-//     const newThead = document.createElement("thead");
-//     const newTR = document.createElement("tr");
-//     const newTH = document.createElement("th");
-//     newTH.innerText = headerText;
-//     newTH.colSpan = 3;
-//     newTH.className = 'thead';
 
-//     newTR.appendChild(newTH);
-//     newThead.appendChild(newTR);
-//     return newThead;
-// }
-
-
+//Generates the top row of the table.
 function topRow(year, noaa_id) {
-    // const headerTR = document.createElement("tr");
-    // const monthTH = document.createElement("th");
-    // monthTH.innerText = "Month";
-    // headerTR.appendChild(monthTH);
 
-    // const tempTH = document.createElement("th");
-    // tempTH.innerText = "Average temperature (\xB0F)";
-    // headerTR.appendChild(tempTH);
-
-    // const precipTH = document.createElement("th");
-    // precipTH.innerText = "Total precipitation (in.)";
-    // headerTR.appendChild(precipTH);
-
-    // const snowTH = document.createElement("th");
-    // snowTH.innerText = "Total snow (in.)";
-    // headerTR.appendChild(snowTH);
     const headerTR = document.createElement("tr");
     const corner = document.createElement('th');
     corner.innerText = `Monthly Data for ${year}`
@@ -245,76 +214,7 @@ function topRow(year, noaa_id) {
     return headerTR;
 }
 
-function rerenderChart() {
-    const yearForm = document.querySelector('#year-input-box-form')
-    const graphDatatypeInput = yearForm.graph_datatype_input.value
-    const userYear = parseInt(yearForm.year.value);
-    console.log(`user wants data for year ${userYear}`);
-    fetch(fetchYearURL(yearForm, userYear)).then(res => res.json()).then(response => {
-        chart.destroy();
-        chart = new Chart(graphCanvas2dCtx(), chartConfig(response, graphDatatypeInput));
-        window.scrollTo(0, document.body.scrollHeight);
-    }).catch(
-        _ => alert("NOAA sent back bad data. Try another location or time span.")
-    )
-}
-
-function submitMonthData(event) {
-    const cell = event.target
-    if (cell.dataset.monthNum != null) {
-
-        if (curHighlightedMonthCell != null) {
-            curHighlightedMonthCell.className = ""
-            clearTableColor()
-        }
-
-        curHighlightedMonthCell = cell
-
-        highlightCol(cell)
-
-        const month = cell.dataset.monthNum
-        const noaaId = cell.parentNode.dataset.noaaId
-        const year = cell.parentNode.dataset.year
-        const body = {
-            noaa_id: noaaId,
-            year: year,
-            month: month
-        };
-        const url = `${BASE_SERVER_PATH}/weather/daily/${btoa(JSON.stringify(body))}`
-        fetch(url).then(res => res.json()).then(dailyData => renderDailyChart(dailyData)).catch(
-            _ => alert("NOAA sent back bad data. Try another location or time span.")
-        )
-    }
-
-}
-
-function highlightCol(cell) {
-    cell.className = "bg-primary"
-
-    const tBody = document.querySelector('tbody')
-
-    tBody.childNodes.forEach(
-        function (row) {
-            row.childNodes[cell.dataset.monthNum].className = "bg-primary"
-        }
-    )
-}
-
-function clearTableColor() {
-    const tBody = document.querySelector('tbody')
-    tBody.childNodes.forEach(
-        function (row) {
-            row.childNodes.forEach(
-                function (cell) {
-                    cell.className = ""
-                }
-            )
-        }
-    )
-}
-
-
-
+//The next three functions generate the rows in the table corresponding to mean_temp, total_precip, and total_snow.
 function createTempRow(newTR, results) {
     const firstCell = document.createElement('td')
     firstCell.innerText = "Average temperature (\xB0F)"
@@ -366,58 +266,78 @@ function createSnowRow(newTR, results) {
 }
 
 
+//Complex function that is called when the user clicks on the top row of the chart. Checks to see if the clicked-on cell is a mobth, and if so, highlights that column, makes a fetch request to the NOAA server for detailed data, and calls a function to render the new, more specific chart.
+function submitMonthData(event) {
+    const cell = event.target
+    if (cell.dataset.monthNum != null) {
 
+        if (curHighlightedMonthCell != null) {
+            curHighlightedMonthCell.className = ""
+            clearTableColor()
+        }
 
-// function createRow(tr, rowData) {
-//     const monthTd = document.createElement("td");
-//     monthTd.innerText = rowData["month"];
-//     tr.appendChild(monthTd);
+        curHighlightedMonthCell = cell
 
-//     const tempTd = document.createElement("td");
-//     tempTd.innerText = rowData["mean_temp"];
-//     tr.appendChild(tempTd);
+        highlightCol(cell)
 
-//     const precipTd = document.createElement("td");
-//     precipTd.innerText = rowData["total_precip"];
-//     tr.appendChild(precipTd);
+        const month = cell.dataset.monthNum
+        const noaaId = cell.parentNode.dataset.noaaId
+        const year = cell.parentNode.dataset.year
+        const body = {
+            noaa_id: noaaId,
+            year: year,
+            month: month
+        };
+        const url = `${BASE_SERVER_PATH}/weather/daily/${btoa(JSON.stringify(body))}`
+        fetch(url).then(res => res.json()).then(dailyData => renderDailyChart(dailyData)).catch(
+            _ => alert("NOAA sent back bad data. Try another location or time span.")
+        )
+    }
 
-//     const snowTd = document.createElement("td");
-//     snowTd.innerText = rowData["total_snow"];
-//     tr.appendChild(snowTd);
-// }
-
-
-function slapYearDataOnDOM(response) {
-    const table = findOldTableAndEmptyOrCreateEmptyTable(MONTHLY_DATA_TABLE_ID, MONTHLY_DATA_TABLE_WRAPPER);
-
-    // const tHead = document.createElement('th')
-    // tHead.colSpan = 13
-    // table.appendChild(tHead);
-
-    table.appendChild(topRow(response.meta.year, response.meta.noaa_id));
-
-    const tBody = document.createElement("tbody");
-
-    const tempTR = document.createElement('tr')
-    createTempRow(tempTR, response.results)
-    tBody.append(tempTR)
-
-    const precipTR = document.createElement('tr')
-    createPrecipRow(precipTR, response.results)
-    tBody.append(precipTR)
-
-    const snowTR = document.createElement('tr')
-    createSnowRow(snowTR, response.results)
-    tBody.append(snowTR)
-    // for (let i = 0; i < response.results.length; i++) {
-    //     const newTR = document.createElement("tr");
-    //     createRow(newTR, response.results[i]);
-    //     newTR.className = "smushed-row"
-    //     tBody.appendChild(newTR);
-    // }
-    table.appendChild(tBody);
 }
 
+//The next two functions deal with highlighting a column when a user clicks a month.
+function highlightCol(cell) {
+    cell.className = "bg-primary"
+
+    const tBody = document.querySelector('tbody')
+
+    tBody.childNodes.forEach(
+        function (row) {
+            row.childNodes[cell.dataset.monthNum].className = "bg-primary"
+        }
+    )
+}
+
+function clearTableColor() {
+    const tBody = document.querySelector('tbody')
+    tBody.childNodes.forEach(
+        function (row) {
+            row.childNodes.forEach(
+                function (cell) {
+                    cell.className = ""
+                }
+            )
+        }
+    )
+}
+
+// Grabs the data from the yearly form and returns the chart to the zoomed out state.
+function rerenderChart() {
+    const yearForm = document.querySelector('#year-input-box-form')
+    const graphDatatypeInput = yearForm.graph_datatype_input.value
+    const userYear = parseInt(yearForm.year.value);
+    console.log(`user wants data for year ${userYear}`);
+    fetch(fetchYearURL(yearForm, userYear)).then(res => res.json()).then(response => {
+        chart.destroy();
+        chart = new Chart(graphCanvas2dCtx(), chartConfig(response, graphDatatypeInput));
+        window.scrollTo(0, document.body.scrollHeight);
+    }).catch(
+        _ => alert("NOAA sent back bad data. Try another location or time span.")
+    )
+}
+
+// Zooms in the chart to its daily state.
 function renderDailyChart(response) {
     console.log(response);
     if (chart == null) {
@@ -431,6 +351,13 @@ function renderDailyChart(response) {
     }
 }
 
+// Generates the listener for the year form to the right of the map.
+function main() {
+    const yearForm = document.querySelector(`#${YEAR_INPUT_BOX_FORM_ID}`);
+    yearForm.addEventListener('submit', yearFormHandler);
+}
+
+// Called when the user submits the year form to the right of the map. Calls functions to render the table and un-hide the directions for how to use the table.
 function yearFormHandler(event) {
     event.preventDefault();
     const userYear = parseInt(event.target.year.value);
@@ -442,12 +369,6 @@ function yearFormHandler(event) {
     }).catch(
         _ => alert("NOAA sent back bad data. Try another location or time span.")
     )
-}
-// I know it's not C++, don't @ me bro.
-function main() {
-    const yearForm = document.querySelector(`#${YEAR_INPUT_BOX_FORM_ID}`);
-    yearForm.addEventListener('submit', yearFormHandler);
-    // chart = chart(ctx, config);
 }
 
 main();
